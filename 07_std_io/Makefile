@@ -2,7 +2,7 @@
 
 CXX=g++
 CXXFLAGS=-g -std=c++14 -Wall
-OBJS=obj/main.o obj/token.o obj/variable.o obj/util.o
+OBJS=obj/main.o
 TARGET=run
 
 all: $(TARGET)
@@ -11,15 +11,6 @@ $(TARGET): $(OBJS)
 	$(CXX) $(OBJS) -o $(TARGET) $(CXXFLAGS)
 
 obj/main.o: main.cpp
-	$(CXX) -c $< $(CXXFLAGS) -o $@
-
-obj/token.o: token.cpp
-	$(CXX) -c $< $(CXXFLAGS) -o $@
-
-obj/variable.o: variable.cpp
-	$(CXX) -c $< $(CXXFLAGS) -o $@
-
-obj/util.o: util.cpp
 	$(CXX) -c $< $(CXXFLAGS) -o $@
 
 clean:
