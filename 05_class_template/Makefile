@@ -2,7 +2,7 @@
 
 CXX=g++
 CXXFLAGS=-g -std=c++14 -Wall
-OBJS=obj/main.o
+OBJS=obj/main.o obj/date.o
 TARGET=run
 
 all: $(TARGET)
@@ -11,6 +11,9 @@ $(TARGET): $(OBJS)
 	$(CXX) $(OBJS) -o $(TARGET) $(CXXFLAGS)
 
 obj/main.o: main.cpp
+	$(CXX) -c $< $(CXXFLAGS) -o $@
+
+obj/date.o: date.cpp
 	$(CXX) -c $< $(CXXFLAGS) -o $@
 
 clean:
