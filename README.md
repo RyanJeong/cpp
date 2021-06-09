@@ -1,142 +1,183 @@
 # cpp
 A repository for practice programming in C++
 
-## Stroustrup C++ 'interview'<br>
-On the 1st of January, 1998, Bjarne Stroustrup gave an interview to the IEEE's Computer magazine. Naturally, the editors thought he would be giving a retrospective view of seven years of object-oriented design, using the language he created. By the end of the interview, the interviewer got more than he had bargained for and, subsequently, the editor decided to suppress its contents, 'for the good of the industry' but, as with many of these things, there was a leak. Here is a complete transcript of what was was said, unedited, and unrehearsed, so it isn't as neat as planned interviews. You will find it interesting...
+## [WIP] - [PPP Style Guide](https://www.stroustrup.com/Programming/PPP-style.pdf)
+### Naming (§3.7)
+* 형 이름 (type name)은 대문자 사용 (e.g. `Table` and `Temperature`)
+* 형이 아닌 이름들은 소문자 사용 (e.g. `x` and `var`)
+* 이름에 여러 단어들이 사용될 경우 _ (underscore) 사용 (e.g. `initial_value` and `symbol_tbl`)
+* 항상 의미있는 이름을 사용할 것
+* 두문자어 (acronyms)를 남용하지 말 것
+* 너무 긴 이름을 사용하지 말 것 (e.g. `remaining_free_slots_in_symbol_table`)
+* 이름의 길이는 유효 범위와 비례해야 하며, 이를테면 어떤 이름의 유효 범위가 넓을수록 해당 이름이 더 설명적이여야 함 (§8.4)
+
+* 숫자 문자와 알파벳 간 식별이 명확해야 하며, `0Oo1lL`과 같이 식별에 어려운 이름 사용은 지양해야 함
+* 변수 이름을 전부 대문자로 사용하지 말 것 (e.g. `ALL_CAPS`)
+* C++ 식별자는 대소문자를 구분함에 유의할 것 (e.g. `Val` and 'va' are different)
+
+### Indentation
+
+```c++
+    // if statement:
+    if (a==b) {
+        // ...
+    }
+    else {
+        // ...
+    }
+
+    // loop:
+    for (int i=0; i<v.size(); ++i) {
+        // ...
+    }
+
+    // Switch statement:
+    switch(a) {
+    case a:
+        // ...
+        break;
+    case b:
+        // ...
+        break;
+    default:
+        // ...
+    }
+
+    // function:
+    double sqrt(double d)
+    {
+        // ...
+    }
+
+    // class or struct:
+    class Temperature_reading {
+    public:
+        // ...
+    private:
+        // ...
+    };
+```
+
+* 중괄호 ({ and })의 위치를 주목할 것
+* 보통 들여쓰기를 할 때 탭 ('\t)을 사용하지만, 코드 에디터의 설정에 따라 간격이 바뀌는 등의 문제가 발생할 수 있음
+* 빈 칸 (' ')을 사용하면 위 문제를 해결할 수 있으며, 최소한 3 칸 이상 간격을 사용할 것
+* 위 코딩 스타일은 보통 K&R style이라고 불리며, 불필요한 개행을 줄임
+* Else-if 부분에서 닫는 중괄호와 여는 중괄호를 같이 사용하는 형태 (`} else {`, cuddled)는 해당 줄을 지우거나 주석 처리할 때 추가 작업이 필요하므로 권장하지 않음
+* 함수 정의 시 여는 괄호를 다음 줄에 사용하면 클래스 정의와 함수 정의를 쉽게 구분할 수 있음
+    * [Which layout style is the best for my code?](https://www.stroustrup.com/bs_faq2.html#layout-style)
+
+### Whitespace
+* 함수, 클래스, 논리적으로 서로 구분되는 코드들 다음에 빈 줄 (empty lines or vertical whitespace)을 사용하면 가독성을 높일 수 있음
+
+```c++
+    void fct1()
+    {
+        Vector<string> v;               // to be used in the whole of the function
+
+        string s;                       // input
+        while (cin>>s) v.push_back(s);
+
+        for (int i= 0; i<size(); ++i) { // processing
+            // …
+        }
+    }
+
+    int fct2()
+    {
+        // something
+
+        // something else
+    }
+
+    class X {
+        // …
+    };
+```
+
+* 절대 한 줄에 두 개 이상의 문장을 넣지 말 것
+    * 코드를 훑는 과정에서 중요한 부분을 놓칠 수 있음
+
+```c++
+    int x = 7; char* p = 29; // don’t
+    int x = 7; f(x); ++x; // don’t
+```
+
+* `if` 문, `for` 문, `while` 문의 내부 문장이 단일 문장이면서 간결한 형태라면 한 줄로 표현
 
-Interviewer: Well, it's been a few years since you changed the world of software design, how does it feel, looking back?
+```c++
+    while (cin>>s) 
+        v.push_back(s);
 
-Stroustrup: Actually, I was thinking about those days, just before you arrived. Do you remember? Everyone was writing 'C' and, the trouble was, they were pretty damn good at it. Universities got pretty good at teaching it, too. They were turning out competent - I stress the word 'competent' - graduates at a phenomenal rate. That's what caused the problem.
+    while (cin>>s) v.push_back(s);
+```
 
-Interviewer: Problem?
+* 예약어 `if`, `for`, `while`, `switch`와  `(` 사이에 빈 칸을 한 칸 띄울 것 
+* 함수 호출 또는 함수 정의 시 함수의 이름과 `(` 사이에 빈 칸을 사용하지 말 것
+* 클래스 이름과 `{` 사이에 빈 칸을 한 칸 띄울 것
+* 표현식 내부에 빈 칸을 넣지 말 것 (의미를 강조하기 위한 빈 칸 삽입은 예외)
 
-Stroustrup: Yes, problem. Remember when everyone wrote Cobol?
+```c++
+    if (x<0 || max<=x) // ...
+    cin>>s;
+    int a = z+y*z;
+```
 
-Interviewer: Of course, I did too
+* 함수의 매개변수 형을 나열할 경우 빈 칸을 사용하고, 함수의 전달인자 목록 작성 시 빈 칸을 쓰지 않음
 
-Stroustrup: Well, in the beginning, these guys were like demi-gods. Their salaries were high, and they were treated like royalty.
+```c++
+    void f(int, char*, couble);
+    f(1,"2",3.4);
+```
 
-Interviewer: Those were the days, eh?
+* 포인터 변수 선언 시 전통적인 C++ 표기를 따를 것
 
-Stroustrup: Right. So what happened? IBM got sick of it, and invested millions in training programmers, till they were a dime a dozen.
+```c++
+    int* p;     // do it this way
+    int *p;     // don't
+    int * p;    // don't
+    int*p;      // don't
+```
 
-Interviewer: That's why I got out. Salaries dropped within a year, to the point where being a journalist actually paid better.
+* 변수 정의 시 초기화를 잊지 말고 사용할 것
 
-Stroustrup: Exactly. Well, the same happened with 'C' programmers.
+```c++
+    Vector<string> v;
 
-Interviewer: I see, but what's the point?
+    string s;
+    while (cin>>s) v.push_back(s);
+```
 
-Stroustrup: Well, one day, when I was sitting in my office, I thought of this little scheme, which would redress the balance a little. I thought 'I wonder what would happen, if there were a language so complicated, so difficult to learn, that nobody would ever be able to swamp the market with programmers? Actually, I got some of the ideas from X10, you know, X windows. That was such a bitch of a graphics system, that it only just ran on those Sun 3/60 things. They had all the ingredients for what I wanted. A really ridiculously complex syntax, obscure functions, and pseudo-OO structure. Even now, nobody writes raw X-windows code. Motif is the only way to go if you want to retain your sanity.
+```c++
+    int* p = &v[i];
+```
 
-Interviewer: You're kidding...?
+### Comments (§7.6.4)
+* 코드를 한 눈에 파악하기 어려운 경우, 이해를 돕기 위해 주석 사용
+* 코드 작성자와 해당 코드를 보는 사람을 위한 내용이며, 컴파일러는 이를 무시함
+* 코드가 명확한 부분은 구태여 설명하지 말 것
+* 주석은 아래와 같이 사용되면 좋음
+    
+    1. Stating intent (what is this code supposed to do), 의도 설명
+    2. Strategy (the general idea of this is …), 코드 작성 근거 및 전략
+    3. Stating invariants, pre- and post-conditions (§5.10), 불변 조건과 코드 수행 전후상태 설명
 
-Stroustrup: Not a bit of it. In fact, there was another problem. Unix was written in 'C', which meant that any 'C' programmer could very easily become a systems programmer. Remember what a mainframe systems programmer used to earn?
+* 주석 작성 시 의미가 명확하고 알기 쉬운 영어를 사용할 것
+* 주석 작성 시 잘못된 표현 (문법, 철자, 구두점 및 대문자) 사용에 주의할 것 
 
-Interviewer: You bet I do, that's what I used to do.
+* 모든 프로그램 파일 (`.h` or `.cpp`)은 주석으로 시작해야 하며, 이때 이름과 날짜, 프로그램이 수행해야 하는 작업이 포함되어야 함
 
-Stroustrup: OK, so this new language had to divorce itself from Unix, by hiding all the system calls that bound the two together so nicely. This would enable guys who only knew about DOS to earn a decent living too.
+```c++
+    /*
+        Joe Q. Programmer
+        Spring Semester 2011 (Jan 31)
+        Solution for exercise 6.5.
+        I use the technique from PPP section XX.Y.ZZ
+    */
+```
 
-Interviewer: I don't believe you said that...
 
-Stroustrup: Well, it's been long enough, now, and I believe most people have figured out for themselves that C++ is a waste of time but, I must say, it's taken them a lot longer than I thought it would.
+```
 
-Interviewer: So how exactly did you do it?
-
-Stroustrup: It was only supposed to be a joke, I never thought people would take the book seriously. Anyone with half a brain can see that object-oriented programming is counter-intuitive, illogical and inefficient.
-
-Interviewer: What?
-
-Stroustrup: And as for 're-useable code' - when did you ever hear of a company re-using its code?
-
-Interviewer: Well, never, actually, but...
-
-Stroustrup: There you are then. Mind you, a few tried, in the early days. There was this Oregon company - Mentor Graphics, I think they were called - really caught a cold trying to rewrite everything in C++ in about '90 or '91. I felt sorry for them really, but I thought people would learn from their mistakes.
-
-Interviewer: Obviously, they didn't?
-
-Stroustrup: Not in the slightest. Trouble is, most companies hush-up all their major blunders, and explaining a $30 million loss to the shareholders would have been difficult. Give them their due, though, they made it work in the end.
-
-Interviewer: They did? Well, there you are then, it proves O-O works.
-
-Stroustrup: Well, almost. The executable was so huge, it took five minutes to load, on an HP workstation, with 128MB of RAM. Then it ran like treacle. Actually, I thought this would be a major stumbling-block, and I'd get found out within a week, but nobody cared. Sun and HP were only too glad to sell enormously powerful boxes, with huge resources just to run trivial programs. You know, when we had our first C++ compiler, at AT&T, I compiled 'Hello World', and couldn't believe the size of the executable. 2.1MB
-
-Interviewer: What? Well, compilers have come a long way, since then.
-
-Stroustrup: They have? Try it on the latest version of g++ - you won't get much change out of half a megabyte. Also, there are several quite recent examples for you, from all over the world. British Telecom had a major disaster on their hands but, luckily, managed to scrap the whole thing and start again. They were luckier than Australian Telecom. Now I hear that Siemens is building a dinosaur, and getting more and more worried as the size of the hardware gets bigger, to accommodate the executables. Isn't multiple inheritance a joy?
-
-Interviewer: Yes, but C++ is basically a sound language.
-
-Stroustrup: You really believe that, don't you? Have you ever sat down and worked on a C++ project? Here's what happens: First, I've put in enough pitfalls to make sure that only the most trivial projects will work first time. Take operator overloading. At the end of the project, almost every module has it, usually, because guys feel they really should do it, as it was in their training course. The same operator then means something totally different in every module. Try pulling that lot together, when you have a hundred or so modules. And as for data hiding. God, I sometimes can't help laughing when I hear about the problems companies have making their modules talk to each other. I think the word 'synergistic' was specially invented to twist the knife in a project manager's ribs.
-
-Interviewer: I have to say, I'm beginning to be quite appalled at all this. You say you did it to raise programmers' salaries? That's obscene.
-
-Stroustrup: Not really. Everyone has a choice. I didn't expect the thing to get so much out of hand. Anyway, I basically succeeded. C++ is dying off now, but programmers still get high salaries - especially those poor devils who have to maintain all this crap. You do realise, it's impossible to maintain a large C++ software module if you didn't actually write it?
-
-Interviewer: How come?
-
-Stroustrup: You are out of touch, aren't you? Remember the typedef?
-
-Interviewer: Yes, of course.
-
-Stroustrup: Remember how long it took to grope through the header files only to find that 'RoofRaised' was a double precision number? Well, imagine how long it takes to find all the implicit typedefs in all the Classes in a major project.
-
-Interviewer: So how do you reckon you've succeeded?
-
-Stroustrup: Remember the length of the average-sized 'C' project? About 6 months. Not nearly long enough for a guy with a wife and kids to earn enough to have a decent standard of living. Take the same project, design it in C++ and what do you get? I'll tell you. One to two years. Isn't that great? All that job security, just through one mistake of judgement. And another thing. The universities haven't been teaching 'C' for such a long time, there's now a shortage of decent 'C' programmers. Especially those who know anything about Unix systems programming. How many guys would know what to do with 'malloc', when they've used 'new' all these years - and never bothered to check the return code. In fact, most C++ programmers throw away their return codes. Whatever happened to good ol' '-1'? At least you knew you had an error, without bogging the thing down in all that 'throw' 'catch' 'try' stuff.
-
-Interviewer: But, surely, inheritance does save a lot of time?
-
-Stroustrup: Does it? Have you ever noticed the difference between a 'C' project plan, and a C++ project plan? The planning stage for a C++ project is three times as long. Precisely to make sure that everything which should be inherited is, and what shouldn't isn't. Then, they still get it wrong. Whoever heard of memory leaks in a 'C' program? Now finding them is a major industry. Most companies give up, and send the product out, knowing it leaks like a sieve, simply to avoid the expense of tracking them all down.
-
-Interviewer: There are tools...
-
-Stroustrup: Most of which were written in C++.
-
-Interviewer: If we publish this, you'll probably get lynched, you do realise that?
-
-Stroustrup: I doubt it. As I said, C++ is way past its peak now, and no company in its right mind would start a C++ project without a pilot trial. That should convince them that it's the road to disaster. If not, they deserve all they get. You know, I tried to convince Dennis Ritchie to rewrite Unix in C++.
-
-Interviewer: Oh my God. What did he say?
-
-Stroustrup: Well, luckily, he has a good sense of humor. I think both he and Brian figured out what I was doing, in the early days, but never let on. He said he'd help me write a C++ version of DOS, if I was interested.
-
-Interviewer: Were you?
-
-Stroustrup: Actually, I did write DOS in C++, I'll give you a demo when we're through. I have it running on a Sparc 20 in the computer room. Goes like a rocket on 4 CPU's, and only takes up 70 megs of disk.
-
-Interviewer: What's it like on a PC?
-
-Stroustrup: Now you're kidding. Haven't you ever seen Windows '95? I think of that as my biggest success. Nearly blew the game before I was ready, though.
-
-Interviewer: You know, that idea of a Unix++ has really got me thinking. Somewhere out there, there's a guy going to try it.
-
-Stroustrup: Not after they read this interview.
-
-Interviewer: I'm sorry, but I don't see us being able to publish any of this.
-
-Stroustrup: But it's the story of the century. I only want to be remembered by my fellow programmers, for what I've done for them. You know how much a C++ guy can get these days?
-
-Interviewer: Last I heard, a really top guy is worth $70 - $80 an hour.
-
-Stroustrup: See? And I bet he earns it. Keeping track of all the gotchas I put into C++ is no easy job. And, as I said before, every C++ programmer feels bound by some mystic promise to use every damn element of the language on every project. Actually, that really annoys me sometimes, even though it serves my original purpose. I almost like the language after all this time.
-
-Interviewer: You mean you didn't before?
-
-Stroustrup: Hated it. It even looks clumsy, don't you agree? But when the book royalties started to come in... well, you get the picture.
-
-Interviewer: Just a minute. What about references? You must admit, you improved on 'C' pointers.
-
-Stroustrup: Hmm. I've always wondered about that. Originally, I thought I had. Then, one day I was discussing this with a guy who'd written C++ from the beginning. He said he could never remember whether his variables were referenced or dereferenced, so he always used pointers. He said the little asterisk always reminded him.
-
-Interviewer: Well, at this point, I usually say 'thank you very much' but it hardly seems adequate.
-
-Stroustrup: Promise me you'll publish this. My conscience is getting the better of me these days.
-
-Interviewer: I'll let you know, but I think I know what my editor will say.
-
-Stroustrup: Who'd believe it anyway? Although, can you send me a copy of that tape?
-
-Interviewer: I can do that.
 
 ## The Real Stroustrup Interview<br>
 https://www.stroustrup.com/ieee_interview.pdf
