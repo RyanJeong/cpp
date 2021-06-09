@@ -5,7 +5,7 @@ A repository for practice programming in C++
 ### Naming (§3.7)
 * 형 이름(type name)은 대문자로 시작한다. (e.g. `Table` and `Temperature`)
 * 형이 아닌 이름들은 소문자로 시작한다. (e.g. `x` and `var`)
-* 이름에 여러 단어들이 사용될 경우 _(underscore)로 시작한다. (e.g. `initial_value` and `symbol_tbl`)
+* 이름에 여러 단어들이 사용될 경우 `_`(underscore)로 시작한다. (e.g. `initial_value` and `symbol_tbl`)
 * 이름은 의미를 잘 나타내야 한다.
 * 두문자어(acronyms)를 남용해서는 안 된다.
 * 너무 긴 이름을 사용해서는 안 된다. (e.g. `remaining_free_slots_in_symbol_table`)
@@ -13,7 +13,7 @@ A repository for practice programming in C++
 
 * 숫자 문자와 알파벳 간 식별이 명확해야 하며, `0Oo1lL`과 같이 식별에 어려운 이름 사용은 지양해야 한다.
 * 변수 이름을 전부 대문자로 사용해서는 안 된다. (e.g. `ALL_CAPS`)
-* C++ 식별자는 대소문자를 구분함에 유의해야 한다. (e.g. `Val` and 'va' are different)
+* C++ 식별자는 대소문자를 구분함에 유의해야 한다. (e.g. `Val` and `val` are different)
 
 ### Indentation
 
@@ -59,7 +59,7 @@ A repository for practice programming in C++
 ```
 
 * 중괄호({ and })의 위치를 주목하자.
-* 보통 들여쓰기를 할 때 탭('\t')을 사용하지만, 코드 에디터의 설정에 따라 간격이 바뀌는 등의 문제가 발생할 수 있다. 이때 빈 칸(' ')을 사용하면 해당 문제를 해결할 수 있으며, 빈 칸 사용 시 최소 3 칸 이상의 간격을 사용해야 한다.
+* 보통 들여쓰기를 할 때 탭(`'\t'`)을 사용하지만, 코드 에디터의 설정에 따라 간격이 바뀌는 등의 문제가 발생할 수 있다. 이때 빈 칸(`' '`)을 사용하면 해당 문제를 해결할 수 있으며, 빈 칸 사용 시 최소 3 칸 이상의 간격을 사용해야 한다.
 * 위 코딩 스타일은 보통 K&R style이라고 불리며, 불필요한 개행을 예방하는 장점이 있다. 
 * Else-if 부분에서 닫는 중괄호와 여는 중괄호를 같이 사용하는 형태(`} else {`, cuddled)는 해당 줄을 지우거나 주석 처리할 때 추가 작업이 필요하므로 권장하지 않는다.
 * 함수 정의 시 여는 괄호를 다음 줄에 표시하는 이유는 클래스 정의와 함수 정의를 쉽게 구분하기 위함이다. 
