@@ -158,7 +158,7 @@ A repository for practice programming in C++
     2. Strategy (the general idea of this is …)
     3. Stating invariants, pre- and post-conditions (§5.10)
 
-* 주석은 결국 사람이 읽는 문장인 만큼, 주석 작성 시 의미가 명확하고 현학적이지 않으며 간결한 영어를 사용해야 한다. 특히, 잘못된 표현(문법 오류, 철자 오류, 구두점 및 대문자 오류 등)을 사용하지 않도록 주의해야 한다. 
+* 주석은 결국 사람이 읽는 문장인 만큼, 주석 작성 시 영어로 작성하되 의미가 명확하고 현학적이지 않으며 간결해야 한다. 특히, 잘못된 표현(문법 오류, 철자 오류, 구두점 및 대문자 오류 등)을 사용하지 않도록 주의해야 한다. 
 * 모든 프로그램 파일(`.h` or `.cpp`)은 파일 시작 부분에 주석이 작성되어 있어야 하며, 주석 안에는 이름과 날짜, 프로그램이 수행되어야 하는 작업 내용이 포함되어야 한다. 
 
 ```c++
@@ -203,7 +203,7 @@ A repository for practice programming in C++
     }
 ```
 
-* 불변 조건과 코드 수행 전후상태 설명은 아래와 같다. 
+* 다음은 불변 조건과 코드 수행 전후상태 설명에 대한 적절한 예시다. 
 
 ```c++
     class vector { // vector of double
@@ -222,7 +222,7 @@ A repository for practice programming in C++
     vector::vector(int s)
           :sz(s), elem(new double[s]), space(s)
     {
-        If (s<0)        // size must be non-negative
+        if (s<0)        // size must be non-negative
             throw Bad_vector_size();
         for (int i=0; i<sz; ++i)
             elem[i]=0;  // elements are initialized
@@ -230,7 +230,64 @@ A repository for practice programming in C++
 ```
 
 ### Declarations
+* 선언은 한 줄로 표현하며, 해당 선언이 의미하는 바를 주석을 사용해 설명한다. 
 
+```c++
+    int p, q, r, b;     // No! Also: not very mnemonic names; where are the initializers?
+
+    const int max = v.size()/2; // maximum partition size
+    int nmonths = 0;            // number of months before current date
+```
+
+* 함수 선언 역시 한 줄로 표현해야 하며, 만약 매개변수 목록이 길어짐에 따라 해당 함수 선언에 여러 줄이 필요할 경우 함수가 너무 복잡하게 선언된 것은 아닌지 고민이 필요하다. 이 경우에는 함수를 덜 복잡하게 새로 정의하는 것을 권장한다. 
+
+```c++
+    int find_index(const string& s, char c); // find c’s position in s (-1 means 'not found')
+```
+
+### Variables and constants
+* 변수는 선언과 동시에 초기화되거나, 사용 전에 필히 초기화해야 한다. 특히 초기화에 사용할 적절한 값이 결정되지 않은 상태에서 변수를 미리 선언해서는 안 된다. 아래 예를 보자. 
+
+```c++
+    vector<int> make_random_numbers(int n)
+        // make n uniformly distributed random numbers
+    {
+        if (n<0)
+            error("make_random_number: bad size");
+        vector<int> res(n);
+        // …
+
+        return res;
+    }
+```
+
+* 위 예는 초기치 `n`이 조건 검사를 통과했을 때 비로소 변수 `res`를 선언함과 동시에 초기화를 수행했다. 이처럼 코드를 작성할 경우 초기화되지 않은 변수를 잘못 사용할 수 있는 경우를 사전에 예방할 수 있다.
+
+```c++
+    vector<int> make_random_numbers(int n)
+        // make n uniformly distributed random numbers
+    {
+        vector<int> res; // why define res when you don’t yet have a size for it?
+        if (n<0)
+            error("make_random_number: bad size");
+        res.resize(n);
+        // …
+
+        return res;
+    }
+```
+* 위 예는 초기치 `n`에 대한 조건 검사를 수행하기 전에 미리 변수 `res`를 선언한 상황이다. 만약 초기치가 조건 검사를 통과하지 못하면 변수 `res`는 무의미한 변수가 된다. 따라서 이와 같이 변수 선언을 해서는 안 된다. 이런 사소한 부분이 나중에 큰 재앙을 일으킬 수 있다. 
+
+
+### Expressions and operators
+
+### Language feature use
+
+### Line length
+
+### Error handling and reporting
+
+### Compiler errors and warnings
 
 
 ## The Real Stroustrup Interview<br>
