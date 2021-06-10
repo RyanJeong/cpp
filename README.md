@@ -136,7 +136,7 @@ A repository for practice programming in C++
     int*p;      // don't
 ```
 
-* 변수 정의 시 초기화를 잊지 말고 꼭 해주어야 한다. 
+* 변수 정의 시 반드시 초기화를 해주어야 한다. 
 
 ```c++
     Vector<string> v;
@@ -239,14 +239,14 @@ A repository for practice programming in C++
     int nmonths = 0;            // number of months before current date
 ```
 
-* 함수 선언 역시 한 줄로 표현해야 하며, 만약 매개변수 목록이 길어짐에 따라 해당 함수 선언에 여러 줄이 필요할 경우 함수가 너무 복잡하게 선언된 것은 아닌지 고민이 필요하다. 이 경우에는 함수를 덜 복잡하게 새로 정의하는 것을 권장한다. 
+* 함수 선언 역시 한 줄로 표현해야 하며, 만약 매개변수 목록이 길어짐에 따라 해당 함수 선언에 여러 줄이 필요할 경우 함수가 너무 복잡하게 선언된 것은 아닌지 고민을 해봐야 한다. 이 경우에는 함수를 새로 정의해 해당 함수의 규모를 축소할 것을 권장한다.  
 
 ```c++
     int find_index(const string& s, char c); // find c’s position in s (-1 means 'not found')
 ```
 
 ### Variables and constants
-* 변수는 선언과 동시에 초기화되거나, 사용 전에 필히 초기화해야 한다. 특히 초기화에 사용할 적절한 값이 결정되지 않은 상태에서 변수를 미리 선언해서는 안 된다. 아래 예를 보자. 
+* 변수는 선언과 동시에 초기화되거나, 사용 전에 필히 초기화해야 한다. 초기치가 결정되지 않은 상황이라면 변수를 미리 선언해서는 안 된다. 아래 예를 보자. 
 
 ```c++
     vector<int> make_random_numbers(int n)
@@ -261,7 +261,7 @@ A repository for practice programming in C++
     }
 ```
 
-* 위 예는 초기치 `n`이 조건 검사를 통과했을 때 비로소 변수 `res`를 선언함과 동시에 초기화를 수행했다. 이처럼 코드를 작성할 경우 초기화되지 않은 변수를 잘못 사용할 수 있는 경우를 사전에 예방할 수 있다.
+* 초기치 `n`을 매개변수로 전달받아 조건을 만족하는지 검사하며, 해당 조건 검사를 통과했을 때 비로소 변수 `res`를 선언함과 동시에 초기화를 수행했다. 이처럼 코드를 작성할 경우 초기화되지 않은 변수를 잘못 사용할 수 있는 경우를 사전에 예방할 수 있다.
 
 ```c++
     vector<int> make_random_numbers(int n)
