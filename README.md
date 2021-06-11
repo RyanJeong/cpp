@@ -1,7 +1,7 @@
 # cpp
 A repository for practice programming in C++
 
-## [WIP] - [PPP Style Guide](https://www.stroustrup.com/Programming/PPP-style.pdf)
+## [PPP Style Guide](https://www.stroustrup.com/Programming/PPP-style.pdf)
 ### Naming (§3.7)
 * 형 이름(type name)은 대문자로 시작한다. (e.g. `Table` and `Temperature`)
 * 형이 아닌 이름들은 소문자로 시작한다. (e.g. `x` and `var`)
@@ -292,7 +292,7 @@ A repository for practice programming in C++
         x = 0;
     }
 ```
-* 몇몇 형(`string` and `vector)은 암묵적으로 선언과 동시에 초기화된다. 아래 코드는 초기화되지 않은 변수는 등장하지 않는다.
+* 몇몇 형(`string` and `vector`)은 암묵적으로 선언과 동시에 초기화된다. 아래 코드는 초기화되지 않은 변수는 등장하지 않는다.
 
 ```c++
     vector<string> vec;
@@ -388,7 +388,7 @@ A repository for practice programming in C++
     for (int i=0; i<v.size(); ++i) // ...
 ```
 
-* `v`는 표준 라이브러리 컨테이너 중 하나다(`vector` or `string). 일반적인 PC에서 오류가 발생할 수 있는 경우는 벡터의 크기가 2<sup>31</sup>을 넘어가는 경우 뿐이다. 이 경우는 거의 등장하지 않는다.
+* `v`는 표준 라이브러리 컨테이너 중 하나다(`vector` or `string`). 일반적인 PC에서 오류가 발생할 수 있는 경우는 벡터의 크기가 2<sup>31</sup>을 넘어가는 경우 뿐이다. 이 경우는 거의 등장하지 않는다.
 * 이 부분에 대한 자세한 설명 또는 2<sup>31</sup> 크기보다 더 큰 벡터가 필요한 경우에는 §25.5.3을 참고한다. 
 
 ## The Real Stroustrup Interview<br>
