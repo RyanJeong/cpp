@@ -101,6 +101,7 @@ A repository for practice programming in C++
 ```
 
 * `if` 문, `for` 문, `while` 문의 내부 문장이 단일 문장이면서 해당 문장이 간결하다면, 한 줄로 표현한다. 
+* There is an argument for <i>always</i> using a second line:
 
 ```c++
     while (cin>>s) 
