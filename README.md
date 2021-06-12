@@ -27,7 +27,7 @@ A repository for practice programming in C++
     }
 
     // loop:
-    for (int i=0; i<v.size(); ++i) {
+    for (int i = 0; i<v.size(); ++i) {
         // ...
     }
 
@@ -74,9 +74,10 @@ A repository for practice programming in C++
         Vector<string> v;               // to be used in the whole of the function
 
         string s;                       // input
-        while (cin>>s) v.push_back(s);
+        while (cin>>s) 
+            v.push_back(s);
 
-        for (int i= 0; i<size(); ++i) { // processing
+        for (int i = 0; i<size(); ++i) { // processing
             // …
         }
     }
@@ -121,7 +122,7 @@ A repository for practice programming in C++
     int a = z+y*z;
 ```
 
-* 함수의 매개변수 형을 나열할 경우에는 빈 칸을 사용하고, 함수의 전달인자 목록을 작성할 경우에는 빈 칸을 생략한다. 
+* 함수의 매개변수 형을 나열할 경우에는 빈 칸을 사용하고, 함수의 전달인자 목록을 작성할 경우에는 빈 칸을 생략한다.
 
 ```c++
     void f(int, char*, couble);
@@ -225,13 +226,15 @@ A repository for practice programming in C++
     {
         if (s<0)        // size must be non-negative
             throw Bad_vector_size();
-        for (int i=0; i<sz; ++i)
+        for (int i = 0; i<sz; ++i)
             elem[i]=0;  // elements are initialized
     } 
 ```
 
 ### Declarations
 * 선언은 한 줄로 표현하며, 해당 선언이 의미하는 바를 주석을 사용해 설명한다. 
+* 선언에서의 `=`는 양 옆에 공백을 추가하고, 대입(assignment)에서의 `=`는 공백을 사용하지 않는다. 엄밀히 구분하면, 대입에서의 `=`는 표현식의 일부이다. 
+* 선언의 `= { initializer-list }`에서 `initializer-list`는 표현식이다(`{ initializer-list }` 또는 `expression`이 올 수 있으므로). 따라서 `initializer-list` 안에도 공백은 사용하지 않는다. 
 
 ```c++
     int p, q, r, b;     // No! Also: not very mnemonic names; where are the initializers?
@@ -289,21 +292,22 @@ A repository for practice programming in C++
 * `cin` 연산이 실패할 수 있다. 이럴 경우에는 오류를 탐지하는 부분을 추가로 구현해 다른 초기치로 초기화하는 식으로 대응하면 된다. 
 
 ```c++
-    if (cin.fail()) {
-        x = 0;
-    }
+    if (cin.fail())
+        x=0;
+    
 ```
 * 몇몇 형(`string` and `vector`)은 암묵적으로 선언과 동시에 초기화된다. 아래 코드는 초기화되지 않은 변수는 등장하지 않는다.
 
 ```c++
     vector<string> vec;
-    for (string buf; cin>>buf; ) vec.push_back(buf);
+    for (string buf; cin>>buf; ) 
+        vec.push_back(buf);
 ```
 
 * 의미가 결여된 상수 (magic constants)를 절대 쓰지 않는다.
 
 ```c++
-    for (int i=1; i<32; ++i) {
+    for (int i = 1; i<32; ++i) {
         // process a month
     }
 ```
@@ -314,7 +318,7 @@ A repository for practice programming in C++
     const int mmax = 32;    // here we explain what 32 is and why
 
     // ...
-    for (int i=1; i<mmax; ++i) {
+    for (int i = 1; i<mmax; ++i) {
         // process a month
     }
 ```
@@ -322,7 +326,7 @@ A repository for practice programming in C++
 * 아래 코드가 훨씬 명확하다.
 
 ```c++
-    for (int i=1; i<months.size(); ++i) {   // oh! Now it's obvious
+    for (int i = 1; i<months.size(); ++i) {   // oh! Now it's obvious
         // process a month
     }
 ```
@@ -334,6 +338,7 @@ A repository for practice programming in C++
 * `count=count+1` 표현보다는 간결한 표현 형태(`++count` or `count++`)를 사용하고, 후위 연산(postfix, `count++`) 보다는 전위 연산(prefix, `++count)를 사용하는 것을 권장한다.
 * 괄호 사용을 권장하지만, 기본적인 연산자 결합 순위에 구태여 괄호를 사용하지 말아야 한다. 예를 들면, 곱셈과 덧셈의 우선순위라든지, 논리 연산자 등이 있다. 우리는 `a*b+c/d` 표현식이 `(a*b)+(c/d)`로 계산됨을 알고 있고, `i<0 || max<i` 표현식이 `(i<0) || (max<i)`로 계산됨을 알고 있다. 
 * 표현식 중간에 대입문을 중첩시키지 말아야 한다. (e.g. `z=a+(b=f(x))*c`) 코드를 분리시키는 편이 훨씬 명확하다. 
+* 표현식 내부에 공백을 사용하지 않는다. 
 
 ### Language feature use
 * 배열보다는 벡터, 포인터보다는 라이브러리에서 제공하는 기능을 이용하는 것을 권장한다. 배열과 포인터는 불필요한 디버깅 또는 오류를 일으킬 가능성이 높다. * 형 변환은 꼭 필요한 경우에만 사용한다.
@@ -386,7 +391,7 @@ A repository for practice programming in C++
 * 경고 중 한 가지를 예외로 둔다. 아래와 같은 경우에서는 `signed/unsigned` 경고가 발생해도 무시한다. 
 
 ```c++
-    for (int i=0; i<v.size(); ++i) // ...
+    for (int i = 0; i<v.size(); ++i) // ...
 ```
 
 * `v`는 표준 라이브러리 컨테이너 중 하나다(`vector` or `string`). 일반적인 PC에서 오류가 발생할 수 있는 경우는 벡터의 크기가 2<sup>31</sup>을 넘어가는 경우 뿐이다. 이 경우는 거의 등장하지 않는다.
