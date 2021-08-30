@@ -1,3 +1,17 @@
-.swp
-run
-*.o
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore Makefile
+!Makefile
+
+# Unignore all dirs
+!*/
+
+# Ignore .vscode
+.vscode
+
+# Ignore .exse files
+*.exe
