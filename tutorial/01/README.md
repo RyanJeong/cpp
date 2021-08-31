@@ -1,6 +1,6 @@
 # C++ Tutorial
 ## 01 - C++ 소개 및 프로그램 분석
-###### [뒤로가기](/tutorial/)
+###### [뒤로가기](/tutorial/#index)
 ---
 ### 첫 프로그램
 ```cpp
@@ -152,5 +152,5 @@ int main(void)
     * 해당 영역은 해당 파일 내에서만 사용 가능한 상태
     
 ###### [처음으로](#c-tutorial)
-###### [뒤로가기](/tutorial/)
+###### [뒤로가기](/tutorial/#index)
 ---
