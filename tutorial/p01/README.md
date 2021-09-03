@@ -1,5 +1,5 @@
 # C++ Tutorial
-## 0X - TITLE
+## 01 - 문자열 클래스 설계
 ###### [뒤로가기](/tutorial/#index)
 ---
 ### SUBTITLE

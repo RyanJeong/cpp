@@ -206,6 +206,73 @@ int main(void)
 * `malloc()`은 메모리를 동적으로 할당 후 해당 위치 주소 반환
 * `new`는 메모리 동적 할당 후 <b>생성자를 자동 호출</b>
 
+### 생성자의 초기화 리스트(initializer list)
+```cpp
+class Test {
+public:
+    Test(void) = default;
+    Test(char, int, double);
+    ~Test(void) = default;
+private:
+    char c_;
+    int i_;
+    double d_;
+};
+
+/*
+Test::Test(char c, int i, double d)
+{
+    c_=c;
+    i_=i;
+    d_=d;
+
+    return;
+}
+*/
+Test::Test(char c, int i, double d) : c_{c}, i_{i}, d_{d} {}
+
+int main(void)
+{
+    Test test('a',2,3.14);
+
+    return 0;
+}
+```
+
+* 아래 두 코드를 비교해 보자:
+```cpp
+// 1) 
+Test::Test(char c, int i, double d)
+{
+    c_=c;
+    i_=i;
+    d_=d;
+
+    return;
+}
+```
+* 기존에 사용하던 생성자 형태
+    * 디폴트 생성자를 호출한 뒤 값을 대입
+        ```cpp
+            int x;
+            x=10;
+        ```
+
+```cpp
+// 2)
+Test::Test(char c, int i, double d) : c_{c}, i_{i}, d_{d} {}
+```
+* 생성자 이름 뒤에 초기화 리스트를 사용하면 생성과 초기화를 동시에 수행
+    * 복사 생성자 호출
+        ```cpp
+            int x = 10;
+        ```
+
+* 초기화 리스트는 클래스의 멤버 변수 중에서 상수나 레퍼런스가 있을 때 용이하게 사용 가능
+    * 상수나 레퍼런스는 생성과 동시에 초기화가 수행되어야 함 
+
+    
+
 ###### [처음으로](#c-tutorial)
 ###### [뒤로가기](/tutorial/#index)
 ---
