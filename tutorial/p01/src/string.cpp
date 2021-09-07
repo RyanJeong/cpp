@@ -149,6 +149,23 @@ char My_string::at(int i) const
         return content_[i];
     }
 }
+My_string& My_string::insert(int pos, const My_string& m_str)
+{
+}
+
+My_string& My_string::insert(int pos, const char* str)
+{
+    My_string temp{str};
+
+    return insert(pos,temp);
+}
+
+My_string& My_string::insert(int pos, char c)
+{
+    My_string temp{c};
+
+    return insert(pos,temp);
+}
 
 int main(void)
 {
