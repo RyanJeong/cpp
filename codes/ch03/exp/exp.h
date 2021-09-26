@@ -2,8 +2,8 @@
 #define __EXP_H__
 
 class Exp {
-	int exp; // 지수부
 	int base; // 베이스
+	int exp; // 지수부
 public:
 	Exp(int b, int e) : base(b), exp(e) { }
 	Exp(int b) : Exp(b,1) { }

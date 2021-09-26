@@ -36,7 +36,7 @@ double Circle::getArea(void)
 
 int main(void) 
 {
-	Circle donu;
+	Circle donut;
 	Circle pizza(30); 
 
 	return 0;

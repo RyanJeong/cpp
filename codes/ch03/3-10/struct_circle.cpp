@@ -6,11 +6,11 @@ struct Struct_circle {
 private:
 	int radius;
 public:
-	Struct_circle(int r) { radius = r; }
+	Struct_circle(int r) { radius=r; }
 	double getArea(void); 
 };
 
-double Struct_circle::getArea(void) 
+inline double Struct_circle::getArea(void) 
 {
 
 	return 3.14*radius*radius;
