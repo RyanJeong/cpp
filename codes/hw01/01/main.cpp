@@ -4,7 +4,7 @@ using namespace std;
 
 class Box {
     int width, height;
-    char fill; // box의 내부를 채우는 문자
+    char fill; // 박스의 내부를 채우는 문자
 public:
     Box(int w, int h) { setSize(w,h); fill='*'; }
     void setFill(char f) { fill=f; }
