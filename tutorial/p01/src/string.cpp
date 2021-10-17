@@ -1,5 +1,3 @@
-// todo: 코드 비교
-// capacity
 #include <iostream>
 #include <string.h>
 
@@ -167,7 +165,12 @@ My_string& My_string::insert(int pos, const My_string& m_str)
     }
 
     if (length_+m_str.length_>capacity_) {
-        capacity_=length_+m_str.length_;
+        if (capacity_*2>length_+m_str.length_) {
+            capacity_*=2;
+        }
+        else {
+            capacity_=length_+m_str.length_;
+        }
         char* prev = content_;
         content_=new char[capacity_];
 
