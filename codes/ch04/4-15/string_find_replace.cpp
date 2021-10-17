@@ -19,6 +19,10 @@ int main(void)
     getline(cin, r, '\n'); // 대치할 문자열 입력
 
     int startIndex = 0;
+    /*
+    It's now or never, come hold me tight. Kiss me my darling, be mine tonight
+    Tomorrow will be too late. It's now or never, my love won't wait&
+    */
     while (true) {
         int fIndex = s.find(f,startIndex); // startIndex부터 문자열 f 검색
         if (fIndex==-1) {
