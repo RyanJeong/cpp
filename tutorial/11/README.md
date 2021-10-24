@@ -73,7 +73,7 @@ int main(void)
 }
 ```
 
-* 위 코드는 컴파일러에 의해 암시적 변환(implicit conversion) 발생
+* 위 코드는 컴파일러에 의해 암묵적 변환(implicit conversion) 발생
     ```cpp
     do_something_with_string(3); // do_something_with_string(My_string(3));
     ```
