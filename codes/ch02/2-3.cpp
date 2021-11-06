@@ -1,19 +1,30 @@
-#include <iostream> 
+/*
+    Copyright 2021 Munseong Jeong <msjeong@daejin.ac.kr>
 
-using namespace std;
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
-int main(void) 
-{
-    cout << "너비를 입력하세요>>";
-    int width;
-    cin>>width; // 키보드로부터 너비를 읽어 width 변수에 저장
+#include <iostream>
 
-    cout << "높이를 입력하세요>>";
-    int height;
-    cin>>height; // 키보드로부터 높이를 읽어 height 변수에 저장
+int main() {
+  std::cout << "너비를 입력하세요>>";
+  int width;
+  std::cin >> width;
 
-    int area = width*height; // 사각형의 면적 계산
-    cout << "면적은 " << area << "\n"; // 면적을 출력하고 다음 줄로 넘어감
+  std::cout << "높이를 입력하세요>>";
+  int height;
+  std::cin >> height;
 
-    return 0;
+  int area = width * height;
+  std::cout << "면적은 " << area << "\n";
+
+  return 0;
 }

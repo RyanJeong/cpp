@@ -1,26 +1,36 @@
+/*
+    Copyright 2021 Munseong Jeong <msjeong@daejin.ac.kr>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include <iostream>
 #include <string>  // string class
 
-using namespace std;
+int main() {
+  // string song("Falling in love with you"); // 문자열 song
+  std::string song = "Falling in love with you";
+  std::cout << song + "를 부른 가수는";
 
-int main(void) 
-{
-    // string song("Falling in love with you"); // 문자열 song
-    // string elvis("Elvis Presley"); // 문자열 elvis
-    string song = "Falling in love with you";
-    cout << song + "를 부른 가수는"; // + 로 문자열 연결
+  // string elvis("Elvis Presley"); // 문자열 elvis
+  std::string elvis = "Elvis Presley";
+  std::cout << "(힌트 : 첫글자는 " << elvis[0] << ")?";
 
-    string elvis = "Elvis Presley";
-    cout << "(힌트 : 첫글자는 " << elvis[0] << ")?";  // [] 연산자 사용
+  std::string singer;
+  std::getline(std::cin, singer);
+  if (singer == elvis) {
+    std::cout << "맞았습니다.";
+  } else {
+    std::cout << "틀렸습니다. "+ elvis + "입니다." << std::endl;
+  }
 
-    string singer; // 문자열 singer
-    getline(cin,singer); // 문자열 입력
-    if (singer==elvis) {  // 문자열 비교
-        cout << "맞았습니다.";
-    }
-    else {
-        cout << "틀렸습니다. "+ elvis + "입니다." << endl; // +로 문자열 연결
-    } 
-
-    return 0;
+  return 0;
 }

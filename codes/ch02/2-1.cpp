@@ -1,15 +1,22 @@
-/* 
-    소스: SimpleC++.cpp
-    cout과 << 연산자를 이용하여 화면에 출력한다.
+/*
+    Copyright 2021 Munseong Jeong <msjeong@daejin.ac.kr>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 */
 
-#include <iostream> // cout과 << 연산자 포함
+#include <iostream>
 
-// C++ 프로그램은 main() 함수에서부터 실행을 시작한다.
-int main(void) 
-{
-    std::cout << "Hello\n"; // 화면에 Hello를 출력하고 다음 줄로 넘어감
-    std::cout << "첫 번째 맛보기입니다.";
+int main() {
+  std::cout << "Hello\n";
+  std::cout << "첫 번째 맛보기입니다.";
 
-    return 0; // main() 함수가 종료하면 프로그램이 종료됨
+  return 0;
 }
