@@ -12,9 +12,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include <iostream>
 
-class Calculator {
- public:
-  void run(void);
-};
+#include "calculator.h"  // [NOLINT]
+#include "adder.h"  // [NOLINT]
+
+void Calculator::run(void) {
+  std::cout << "두 개의 수를 입력하세요>>";
+  int a, b;
+  std::cin >> a >> b;
+  Adder adder(a, b);
+  std::cout << adder.process();
+}

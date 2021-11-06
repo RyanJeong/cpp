@@ -12,9 +12,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include "adder.h"  // [NOLINT]
 
-class Calculator {
- public:
-  void run(void);
-};
+Adder::Adder(int a, int b) : op1(a), op2(b) { }
+
+// inline int Adder::process(void)  compile-time
+int Adder::process(void) { return op1 + op2; }
