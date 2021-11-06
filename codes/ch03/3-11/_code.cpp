@@ -37,8 +37,6 @@ void Calculator::run(void) {
   std::cin >> a >> b;
   Adder adder(a, b);
   std::cout << adder.process();
-
-  return;
 }
 
 int main() {

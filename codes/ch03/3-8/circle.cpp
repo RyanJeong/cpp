@@ -42,8 +42,6 @@ Circle globalPizza(2000);
 void f() {
   Circle fDonut(100);
   Circle fPizza(200);
-
-  return;
 }
 
 int main() {

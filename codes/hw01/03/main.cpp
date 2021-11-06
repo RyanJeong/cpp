@@ -1,25 +1,35 @@
+/*
+    Copyright 2021 Munseong Jeong <msjeong@daejin.ac.kr>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 class Circle {
-    int radius; // 원의 반지름 값
-    string name; // 원의 이름
-public:
-    void setCircle(string name, int radius); // 이름과 반지름 설정
-    double getArea();
-    string getName();
+  int radius;
+  string name;
+ public:
+  void setCircle(string name, int radius);
+  double getArea();
+  string getName();
 };
 
 class CircleManager {
-    Circle* p; // Circle 배열에 대한 포인터
-    int size; // 배열의 크기
-public:
-    CircleManager(int size); // size 크기의 배열을 동적 생성
-                             // 사용자로부터 입력 
-    ~CircleManager();
-    void searchByName(); // 사용자로부터 원의 이름을 입력받아 면적 출력
-    void searchByArea(); // 사용자로부터 면적을 입력받아 면적보다 큰 원의 이름 출력
+  Circle* p;
+  int size;
+ public:
+  explicit CircleManager(int size);
+  ~CircleManager();
+  void searchByName();
+  void searchByArea();
 };
-
