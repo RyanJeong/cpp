@@ -1,24 +1,36 @@
+/*
+    Copyright 2021 Munseong Jeong <msjeong@daejin.ac.kr>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include <iostream>
 
-using namespace std;
+int main() {
+  std::cout << "i" << '\t' << "n" << '\t' << "refn" << std::endl;
 
-int main(void) 
-{
-    cout << "i" << '\t' << "n" << '\t' << "refn" << endl;
-    int i = 1;
-    int n = 2;
-    int& refn = n; // 참조 변수 refn 선언. refn은 n에 대한 별명
-    n=4; 
-    ++refn; // refn=5, n=5
-    cout << i << '\t' << n << '\t' << refn << endl;
+  int i = 1;
+  int n = 2;
+  int& refn = n;
+  n = 4;
+  ++refn;
+  std::cout << i << '\t' << n << '\t' << refn << std::endl;
 
-    refn=i; // refn=1, n=1
-    ++refn; // refn=2, n=2
-    cout << i << '\t' << n << '\t' << refn << endl;
-    
-    int* p = &refn; // p는 refn의 주소를 가짐. 실제 p는 n의 주소를 가짐
-    *p=20; // refn=20, n=20
-    cout << i << '\t' << n << '\t' << refn << endl;
+  refn = i;
+  ++refn;
+  std::cout << i << '\t' << n << '\t' << refn << std::endl;
 
-    return 0;
+  int* p = &refn;
+  *p = 20;
+  std::cout << i << '\t' << n << '\t' << refn << std::endl;
+
+  return 0;
 }

@@ -1,67 +1,61 @@
-// copy 5-2
+/*
+    Copyright 2021 Munseong Jeong <msjeong@daejin.ac.kr>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+// copy 5-1
 #include <iostream>
 
-using namespace std;
-
 class Circle {
-private:
-    int radius; 
-public:
-    Circle(); 
-    Circle(int r);
-    ~Circle();
-    // inline
-    double getArea()  { return 3.14*radius*radius; }
-    int getRadius() { return radius; }
-    void setRadius(int radius) { this->radius = radius; }
-}; 
+ private:
+  int radius;
+ public:
+  Circle();
+  explicit Circle(int r);
+  ~Circle();
+  double getArea() { return radius * radius * 3.14; }
+  int getRadius() { return radius; }
+  void setRadius(int radius) { this->radius = radius; }
+};
 
-Circle::Circle() 
-{
-    radius = 1;
-    cout << "생성자 실행 radius = " << radius << endl;
+inline Circle::Circle() : Circle(1) { }
 
-    return;
+inline Circle::Circle(int radius) {
+  this->radius = radius;
+  std::cout << "생성자 실행 radius = " << radius << std::endl;
 }
 
-Circle::Circle(int radius) 
-{
-    this->radius = radius;
-    cout << "생성자 실행 radius = "  << radius << endl;
-
-    return;
+inline Circle::~Circle() {
+  std::cout << "소멸자 실행, radius = " << radius << std::endl;
 }
 
-Circle::~Circle() 
-{
-    cout << "소멸자 실행 radius = " << radius << endl;
-
-    return;
+void increase(Circle c) {
+  int r = c.getRadius();
+  c.setRadius(r + 1);
 }
 
+Circle getCircle() {
+  Circle tmp(30);
 
-void increase(Circle c) 
-{
-    int r = c.getRadius();
-    c.setRadius(r+1);
-
-    return;
+  return tmp;
 }
 
-Circle getCircle() 
-{
-    Circle tmp(30);
+int main() {
+  Circle c;
+  std::cout << c.getArea() << std::endl;
 
-    return tmp; // 객체 tmp을 리턴한다.
-}
+  c = getCircle();
+  std::cout << c.getArea() << std::endl;
+  c.setRadius(c.getRadius() + 1);
 
-int main(void) 
-{
-    Circle c; // 객체가 생성된다. radius=1로 초기화된다.
-    cout << c.getArea() << endl;
-
-    c = getCircle();
-    cout << c.getArea() << endl;
-    
-    return 0;
+  return 0;
 }

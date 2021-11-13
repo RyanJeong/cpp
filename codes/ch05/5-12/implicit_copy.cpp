@@ -1,95 +1,80 @@
-// copy 5-11, f, g, main
+/*
+    Copyright 2021 Munseong Jeong <msjeong@daejin.ac.kr>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+// copy 5-11
 #include <iostream>
 #include <cstring>
 
-using namespace std;
-
-class Person { // Person 클래스 선언
-    char* name;
-    int id;
-public:
-    Person(int id, const char* name); // 생성자
-    Person(const Person& person); // 복사 생성자
-    ~Person(); // 소멸자
-    void changeName(const char *name);
-    void show() { cout << id << ',' << name << endl; }
+class Person {
+  char* name;
+  int id;
+ public:
+  Person(int id, const char* name);
+  Person(const Person& person);
+  ~Person();
+  void changeName(const char *name);
+  void show() { std::cout << id << ',' << name << std::endl; }
 };
 
-Person::Person(int id, const char* name) 
-{ // 생성자
-    this->id=id;
-    int len = strlen(name); // name의 문자 개수
-    this->name=new char[len+1]; // name 문자열 공간 핟당
-    strcpy(this->name,name); // name에 문자열 복사
-
-    return;
+inline Person::Person(int id, const char* name) {
+  this->id = id;
+  int len = strlen(name);
+  this->name = new char[len+1];
+  strcpy(this->name, name); // [NOLINT]
 }
 
-/*
-Person::Person(const Person& person) 
-{ // 복사 생성자
-    this->id = person.id; // id 값 복사
-    int len = strlen(person.name);// name의 문자 개수
-    this->name = new char [len+1]; // name을 위한 공간 핟당
-    strcpy(this->name, person.name); // name의 문자열 복사
-    cout << "복사 생성자 실행. 원본 객체의 이름 " << this->name << endl;
-
-    return;
-}
-*/
-Person::Person(const Person& person) : Person(person.id,person.name)
-{
-    cout << "복사 생성자 실행. 원본 객체의 이름 " << this->name << endl;
-
-    return;
+inline Person::Person(const Person& person)
+    : Person(person.id, person.name) {
+  std::cout << "복사 생성자 실행. 원본 객체의 이름 "
+            << this->name << std::endl;
 }
 
-Person::~Person() 
-{ // 소멸자
-    if (name) {
-        // 만일 name에 동적 할당된 배열이 있으면
-        delete [] name; // 동적 할당 메모리 소멸
-    }
-
-    return;
+inline Person::~Person() {
+  if (name) {
+    delete [] name;
+  }
 }
 
-void Person::changeName(const char* name) 
-{ // 이름 변경
-    if (strlen(name)>strlen(this->name)) {
-
-        return; // 현재 name에 할당된 메모리보다 긴 이름으로 바꿀 수 없다.
-    }
-    strcpy(this->name,name);
-
-    return;
+inline void Person::changeName(const char* name) {
+  if (strlen(name) <= strlen(this->name)) {
+    strcpy(this->name, name); // [NOLINT]
+  }
 }
 
-void f(Person person) 
-{
-    person.changeName("dummy");
+inline void f(Person person) { person.changeName("dummy"); }
 
-    return;
+inline Person g() {
+  Person mother(2, "Jane");
+
+  return mother;
 }
 
-Person g() 
-{
-    Person mother(2,"Jane");
+int main() {
+  Person father(1, "Kitae");
+  std::cout << "Person son = father;" << std::endl;
+  // 복사 생성자 호출
+  Person son = father;
+  std::cout << "f(father);" << std::endl;
 
-    return mother;
-}
+  // 복사 생성자 호출
+  f(father);
+  std::cout << "g();" << std::endl;
 
-int main(void) 
-{
-    Person father(1,"Kitae");
-    cout << "Person son = father;" << endl;
-    Person son = father;		// 복사 생성자 호출
-    cout << "f(father);" << endl;
-    f(father);					// 복사 생성자 호출
-    cout << "g();" << endl;
-    g();						// 복사 생성자 호출
-    // copy elision 
-    // "-fno-elide-constructors"
+  // 복사 생성자 호출
+  // copy elision
+  // "-fno-elide-constructors"
+  g();
 
-    return 0;
+  return 0;
 }
