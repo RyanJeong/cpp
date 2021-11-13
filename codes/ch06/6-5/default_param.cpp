@@ -14,18 +14,16 @@ limitations under the License.
 
 #include <iostream>
 
-void fillLine(int n, char c);
+void fillLine(int n = 25, char c = '*') {
+  for (int i = 0; i < n; ++i) {
+    std::cout << c;
+  }
+  std::cout << std::endl;
+}
 
 int main() {
   fillLine();
   fillLine(10, '%');
 
   return 0;
-}
-
-void fillLine(int n = 25, char c = '*') {
-  for (int i = 0; i < n; ++i) {
-    std::cout << c;
-  }
-  std::cout << std::endl;
 }

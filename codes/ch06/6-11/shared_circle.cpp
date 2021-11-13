@@ -33,7 +33,7 @@ Circle::Circle(int r) {
 int Circle::numOfCircles = 0;
 
 int main() {
-  Circle *p = new Circle[10];
+  Circle* p = new Circle[10];
   std::cout << "생존하고 있는 원의 개수 = "
             << Circle::getNumOfCircles() << std::endl;
 

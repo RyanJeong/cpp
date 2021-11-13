@@ -15,7 +15,7 @@ limitations under the License.
 #include <iostream>
 
 class MyVector{
-  int *p;
+  int* p;
   int size;
  public:
   explicit MyVector(int n = 100) {
@@ -27,9 +27,8 @@ class MyVector{
 };
 
 int main() {
-  MyVector *v1, *v2;
-  v1 = new MyVector();
-  v2 = new MyVector(1024);
+  MyVector* v1 = new MyVector();
+  MyVector* v2 = new MyVector(1024);
 
   std::cout << v1->GetSize() << std::endl;
   std::cout << v2->GetSize() << std::endl;
