@@ -17,6 +17,7 @@ limitations under the License.
 #include <string>
 
 class Point {
+ protected:
   int x, y;
  public:
   void set(int x, int y) { this->x = x; this->y = y; }

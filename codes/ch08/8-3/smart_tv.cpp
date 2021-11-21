@@ -15,7 +15,7 @@ limitations under the License.
 #include <iostream>
 #include <string>
 
-class  TV {
+class TV {
   int size;
  public:
   TV() : size(20) { }
@@ -30,7 +30,7 @@ class WideTV : public TV {
   bool getVideoIn() { return videoIn; }
 };
 
-class  SmartTV : public WideTV {
+class SmartTV : public WideTV {
   std::string ipAddr;
  public:
   SmartTV(std::string ipAddr, int size) : WideTV(size, true), ipAddr(ipAddr) { }
