@@ -13,4 +13,4 @@ class MyBaseArray {
   int GetCapacity();
 };
 
-#endif  // HW02_01_MY_BASE_ARRAY
+#endif  // HW02_04_MY_BASE_ARRAY
