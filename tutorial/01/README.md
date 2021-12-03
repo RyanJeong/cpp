@@ -39,83 +39,78 @@ int main() {
     * `std::cout`은 `std`라는 이름 공간에 속해 있는 `cout`을 사용한다는 의미 
 
 * 이름 공간의 사용 예:
+    * 함수 `foo(), bar()`은 이름은 같으나 이름 공간에 의해 서로 구분함
     ```cpp
-    // header1
+    // header1.h
+
     namespace header1 {
     int foo();
     void bar();
     }  // header1
     ```
     ```cpp
-    // header2
+    // header2.h
+
     namespace header2 {
     double foo();
     int bar();
     }  // header2
     ```
-    * 함수 `foo(), bar()`은 이름은 같으나 이름 공간에 의해 서로 구분됨
+
+    * `header1::foo()`는 `header1`의 이름 공간에 속해있을 때, 범위지정 연산(`::`)을 사용하지 않아도 됨:
 
     ```cpp
     #include "header1.h"
 
     namespace header1 {
     int func() { 
-      // header1::foo()
-      return foo(); 
+      return foo();  // header1::foo()
     }
     }  // header1
     ```
-    * 이름 공간 내에서 <i>name</i>(ex. `foo()`)이 사용될 때, 해당 이름 공간에 존재하는 <i>name</i>을 우선 사용
-
+    * 이름 공간에서 다른 이름 공간에 속한 함수를 호출하고자 할 때, `::`를 사용해 사용하고자 하는 <i>name</i>과 연결해 사용할 수 있음
     ```cpp
     #include "header1.h"
     #include "header2.h"
 
     namespace header1 {
     int func() {
-        header2::bar();
-        
-         // header1::foo()
-        return foo();
+      header2::bar();
+      
+      return foo();  // header1::foo()
     }
     }  // header1
     ```
-    * 이름 공간에서 다른 이름 공간에 속한 함수를 호출하고자 할 때, `::`를 사용해 사용하고자 하는 <i>name</i>과 연결해 사용할 수 있음
-
+    * 이름 공간이 없다면 직접 `::`를 사용해 연결해 사용해야 함
     ```cpp
     #include "header1.h"
     #include "header2.h"
 
     int func() { header1::foo(); }
     ```
-    * 이름 공간이 없다면 직접 `::`를 사용해 연결해 사용해야 함
-
+    * `header` 이름 공간에 속한 `foo()` 함수만 사용하고자 한다면 위와 같이 이름 공간 대신 특정 함수를 지정해 사용할 수 있음  
     ```cpp
     #include "header1.h"
 
     using header1::foo;
 
-    int func(void)
-    {
-
-        return foo(); // header1:foo()
+    int func() {
+      return foo();  // header1:foo()
     }
     ```
-    * `header` 이름 공간에 속한 `foo()` 함수만 사용하고자 한다면 위와 같이 이름 공간 대신 특정 함수를 지정해 사용할 수 있음  
-
+    * `header1` 이름 공간에 정의된 <i>name</i>들을 `header1::` 없이 사용하고자 할 때 위와 같이 이름 공간을 명시할 수 있음
+      * <b>Do not use namespace using-directives.  Use using-declarations instead.</b>
     ```cpp
     #include "header1.h"
 
     using namespace header1;
 
-    int func(void)
-    {
-        bar(); // header1::bar()
+    int func() {
+      bar();  // header1::bar()
 
-        return foo(); // header1:foo()
+      return foo();  // header1:foo()
     }
     ```
-    * `header1` 이름 공간에 정의된 <i>name</i>들을 `header1::` 없이 사용하고자 할 때 위와 같이 이름 공간을 명시해야 함
 
 * `using namespace std;`
     * <b>권장하지 않음</b>
@@ -126,20 +121,17 @@ int main() {
 * `namespace`
     ```cpp
     namespace {
-        int static_func(void)
-        {
-
-            return 3;
-        }
-
-        int static_var = 1;
+    int static_func() {
+      return 3;
     }
 
-    int main(void)
-    {
-        static_var=static_func();
+    int static_var = 1;
+    }  // static
 
-        return 0;
+    int main() {
+      static_var = static_func();
+
+      return 0;
     }
     ```
     * `namespace` 키워드 다음에 아무것도 오지 않는다면, 해당 영역은 `static` 영역임
