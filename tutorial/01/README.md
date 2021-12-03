@@ -6,11 +6,10 @@
 ```cpp
 #include <iostream>
 
-int main(void)
-{
-    std::cout << "Hello, World!" << std::endl;
-
-    return 0;
+int main() {
+  std::cout << "Hello, World!" << std::endl;
+  
+  return 0;
 }
 ```
 * `#include <iostream>`
@@ -21,7 +20,7 @@ int main(void)
         1. <b>프로그래머가 정의한 헤더파일</b> 선언 시 확장자 `.h`를 붙인다.
         2. <b>표준 헤더파일</b> 선언 시 확장자 `.h`를 생략한다. 
 
-* `int main(void) { ... }`
+* `int main() { ... }`
     * 프로그램 시작 시 가장 먼저 실행되는 함수
     * `{ ... }` 부분은 `main` 함수의 몸체
 
@@ -43,16 +42,16 @@ int main(void)
     ```cpp
     // header1
     namespace header1 {
-        int foo();
-        void bar();
-    }
+    int foo();
+    void bar();
+    }  // header1
     ```
     ```cpp
     // header2
     namespace header2 {
-        double foo();
-        int bar();
-    }
+    double foo();
+    int bar();
+    }  // header2
     ```
     * 함수 `foo(), bar()`은 이름은 같으나 이름 공간에 의해 서로 구분됨
 
@@ -60,12 +59,11 @@ int main(void)
     #include "header1.h"
 
     namespace header1 {
-        int func(void)
-        {
-
-            return foo(); // header1::foo()
-        }
+    int func() { 
+      // header1::foo()
+      return foo(); 
     }
+    }  // header1
     ```
     * 이름 공간 내에서 <i>name</i>(ex. `foo()`)이 사용될 때, 해당 이름 공간에 존재하는 <i>name</i>을 우선 사용
 
@@ -74,13 +72,13 @@ int main(void)
     #include "header2.h"
 
     namespace header1 {
-        int func(void)
-        {
-            header2::bar();
-
-            return foo(); // header1::foo()
-        }
+    int func() {
+        header2::bar();
+        
+         // header1::foo()
+        return foo();
     }
+    }  // header1
     ```
     * 이름 공간에서 다른 이름 공간에 속한 함수를 호출하고자 할 때, `::`를 사용해 사용하고자 하는 <i>name</i>과 연결해 사용할 수 있음
 
@@ -88,11 +86,7 @@ int main(void)
     #include "header1.h"
     #include "header2.h"
 
-    int func(void)
-    {
-
-        header1::foo(); 
-    }
+    int func() { header1::foo(); }
     ```
     * 이름 공간이 없다면 직접 `::`를 사용해 연결해 사용해야 함
 
