@@ -12,7 +12,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// copy 10-6
 #include <iostream>
+#include <string>
 
 template <typename T>
 class MyStack {
@@ -47,19 +49,43 @@ T MyStack<T>::pop() {
   return res;
 }
 
+class Point {
+  int x, y;
+ public:
+  Point(int x = 0, int y = 0) : x(x), y(y) { }  // [NOLINT]
+  void show() { std::cout << '(' << x << ',' << y << ')' << std::endl; }
+};
+
 int main() {
-  MyStack<int> iStack;
-  iStack.push(3);
-  std::cout << iStack.pop() << std::endl;
+  MyStack<int*> ipStack;
+  int* p = new int[3];
+  for (int i = 0; i < 3; ++i)
+    p[i] = i * 10;
+  ipStack.push(p);
 
-  MyStack<double> dStack;
-  dStack.push(3.5);
-  std::cout << dStack.pop() << std::endl;
+  int* q = ipStack.pop();
+  for (int i = 0; i < 3; ++i)
+    std::cout << q[i] << ' ';
+  std::cout << std::endl;
+  delete[] p;
 
-  MyStack<char> *p = new MyStack<char>();
-  p->push('a');
-  std::cout << p->pop() << std::endl;
-  delete p;
+  MyStack<Point> pointStack;
+  Point a(2, 3), b;
+  pointStack.push(a);
+  b = pointStack.pop();
+  b.show();
+
+  MyStack<Point*> pStack;
+  pStack.push(new Point(10, 20));
+  Point* pPoint = pStack.pop();
+  pPoint->show();
+
+  MyStack<std::string> stringStack;
+  std::string s = "c++";
+  stringStack.push(s);
+  stringStack.push("java");
+  std::cout << stringStack.pop() << ' '
+            << stringStack.pop() << std::endl;
 
   return 0;
 }
