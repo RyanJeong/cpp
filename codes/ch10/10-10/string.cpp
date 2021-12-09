@@ -22,7 +22,7 @@ int main() {
 
   std::cout << "이름을 5개 입력하라" << std::endl;
   for (int i = 0; i < 5; ++i) {
-    std::cout << i+1 << ">>";
+    std::cout << i + 1 << ">>";
     getline(std::cin, name);
     sv.push_back(name);
   }
