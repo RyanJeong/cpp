@@ -24,7 +24,7 @@ int main() {
   std::vector<int> v = { 1, 2, 3, 4, 5 };
 
   for_each(v.begin(), v.end(), print);
-  for_each(v.begin(), v.end(), [](int n) { std::cout << n << ' ' ; });
+  for_each(v.begin(), v.end(), [](int n) { std::cout << n << ' '; });
 
   return 0;
 }
