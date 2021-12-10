@@ -15,5 +15,5 @@ limitations under the License.
 #include <iostream>
 
 int main() {
-  [](int x, int y) { std::cout << "합은 " << x + y; } (2, 3);
+  [](int x, int y) { std::cout << "합은 " << x + y; }(2, 3);
 }
