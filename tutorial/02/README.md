@@ -15,58 +15,54 @@
 void swap_ptr(int*, int*);
 void swap_ref(int&, int&);
 
-int main(void)
-{
-    int a = 3;
-    int b = 4;
-    int x = 3;
-    int y = 4;
+int main() {
+  int a = 3;
+  int b = 4;
+  int x = 3;
+  int y = 4;
 
-    // swap via pointer
-    std::cout << "Before: " << '\n'
-              << "a: " << a << ", b: " << b << '\n'
-              << "[main]address of variable 'a': " << &a << '\n'
-              << "[main]address of variable 'b': " << &b << '\n';
-    swap_ptr(&a,&b);
-    std::cout << "After : " << '\n'
-              << "a: " << a << ", b: " << b << '\n';
+  // swap via pointer
+  std::cout << "Before: " << '\n'
+            << "a: " << a << ", b: " << b << '\n'
+            << "[main]address of variable 'a': " << &a << '\n'
+            << "[main]address of variable 'b': " << &b << '\n';
+  swap_ptr(&a, &b);
+  std::cout << "After : " << '\n'
+            << "a: " << a << ", b: " << b << '\n';
 
-    // swap via reference
-    std::cout << "Before: " << '\n'
-              << "x: " << x << ", y: " << y << '\n'
-              << "[main]address of variable 'x': " << &x << '\n'
-              << "[main]address of variable 'y': " << &y << '\n';
-    swap_ref(x,y);
-    std::cout << "After : " << '\n'
-              << "x: " << x << ", y: " << y << '\n';
+  // swap via reference
+  std::cout << "Before: " << '\n'
+            << "x: " << x << ", y: " << y << '\n'
+            << "[main]address of variable 'x': " << &x << '\n'
+            << "[main]address of variable 'y': " << &y << '\n';
+  swap_ref(x, y);
+  std::cout << "After : " << '\n'
+            << "x: " << x << ", y: " << y << '\n';
 
-    return 0;
+  return 0;
 }
 
-void swap_ptr(int* a, int* b)
-{
-    int tmp;
+void swap_ptr(int* a, int* b) {
+  int tmp;
 
-    tmp=*a;
-    *a=*b;
-    *b=tmp;
-    std::cout << "[swap]address of variable 'a': " << &a << '\n'
-              << "[swap]address of variable 'b': " << &b << '\n';
-
-    return;
+  tmp = *a;
+  *a = *b;
+  *b = tmp;
+  std::cout << "[swap]address of variable 'a': " << &a << '\n'
+            << "[swap]address of variable 'b': " << &b << '\n';
 }
-void swap_ref(int& x, int& y)
-{
-    int tmp;
 
-    tmp=x;
-    x=y;
-    y=tmp;
-    std::cout << "[swap]address of variable 'x': " << &x << '\n'
-              << "[swap]address of variable 'y': " << &y << '\n';
+void swap_ref(int& x, int& y) {
+  int tmp;
 
-    return;
+  tmp = x;
+  x = y;
+  y = tmp;
+  std::cout << "[swap]address of variable 'x': " << &x << '\n'
+            << "[swap]address of variable 'y': " << &y << '\n';
 }
+
+
 ```
 ```text
 Before: 
@@ -101,9 +97,9 @@ x: 4, y: 3
 * 레퍼런스는 리터럴을 가리킬 수 없음
     ```cpp
     int& ref = 4;
-    ref=10; // ERROR!
+    ref = 10; // ERROR!
     ```
-    * 위와 같은 코드가 있을 때, `ref=10` 표현식은 `4=10`과 같으며, 리터럴은 메모리 상에 존재하는 변하지 않는 객체이므로 해당 동작은 위법(illegal)임
+    * 위와 같은 코드가 있을 때, `ref = 10` 표현식은 `4 = 10`과 같으며, 리터럴은 메모리 상에 존재하는 변하지 않는 객체이므로 해당 동작은 위법(illegal)임
     * 따라서 일반 레퍼런스는 리터럴을 가리킬 수 없음
         ```text
         error C2440: 'initializing' : cannot convert from 'int' to 'int &'
@@ -122,7 +118,7 @@ There shall be no references to references, no arrays of references, and no poin
 ```
 * 배열 레퍼런스를 <b>굳이</b> 사용하고자 한다면:
     ```cpp
-    int a[3] = {1,2,3};
+    int a[3] = { 1, 2, 3 };
     int (&ref)[3] = a;
     ```
     * `ref`는 레퍼런스이며, `int` 형을 가리키는데 크기가 3인 배열이며, 그 대상이 `a`
@@ -130,19 +126,17 @@ There shall be no references to references, no arrays of references, and no poin
 
 * <i>Dangling reference</i>
     ```cpp
-    int& func(void)
-    {
-        int a = 3;
+    int& func() {
+      int a = 3;
 
-        return a;
+      return a;
     }
 
-    int main(void)
-    {
-        int b = func();
-        b = 3; // ERROR! segmentation fault
+    int main() {
+      int b = func();
+      b = 3; // ERROR! segmentation fault
 
-        return 0;
+      return 0;
     }
     ```
     * `func()` 함수는 컴파일러에 의해 `int& tmp = a`으로 처리되고, 함수는 `tmp`를 반환
@@ -152,20 +146,18 @@ There shall be no references to references, no arrays of references, and no poin
     * 모호한 대상(이미 할당이 해제된)에 참조하려고 한다면 이는 오류를 반환
 
     ```cpp
-    int& func(int& a)
-    {
-        a=5;
-        
-        return a;
+    int& func(int& a) {
+      a = 5;
+     
+      return a;
     }
 
-    int main(void)
-    {
-        int x = 2;
-        int y = func(x); // int& y = x
-        y=4; // OK!
+    int main() {
+      int x = 2;
+      int y = func(x);
+      y = 4; // OK!
 
-        return 0;
+      return 0;
     }
     ```
     * `func()` 함수는 컴파일러에 의해 `int& tmp = a`로 처리
@@ -174,19 +166,17 @@ There shall be no references to references, no arrays of references, and no poin
     * 따라서 <i>dangling reference</i>가 발생하지 않음
 
     ```cpp
-    int func(void)
-    {
-        int a = 5;
+    int func() {
+      int a = 5;
 
-        return a;
+      return a;
     }
 
-    int main(void)
-    {
-        int& c = func(); // int& c = 5;
-                         // c = 4; // ???
+    int main() {
+      int& c = func(); // int& c = 5;
+                       // c = 4; -> 5 = 4 (???)
 
-        return 0;
+      return 0;
     }
     ```
     * `func()`은 반환 값인 `a`, 즉 `a`가 가지고 있는 값인 5로 평가됨(evaluated)
@@ -194,20 +184,18 @@ There shall be no references to references, no arrays of references, and no poin
         * 레퍼런스를 참조해 해당 객체의 값을 바꿀 수 있기 때문이며, 이러한 행위는 위법(illegal)
 
     ```cpp
-    int func(void)
-    {
-        int a = 5;
+    int func() {
+      int a = 5;
 
-        return a;
+      return a;
     }
 
-    int main(void)
-    {
-        const int& x = func(); // const int& x = 5;, read-only
+    int main() {
+      const int& x = func(); // const int& x = 5;, read-only
 
-        std::cout << "x: " << x << std::endl;
+      std::cout << "x: " << x << std::endl;
 
-        return 0;
+      return 0;
     }
     ```
     * `func()`은 반환 값인 `a`, 즉 `a`가 가지고 있는 값인 5로 평가됨(evaluated)
