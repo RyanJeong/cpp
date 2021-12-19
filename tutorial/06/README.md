@@ -29,7 +29,10 @@
 
       Date day(2021, 9, 2);    // 암시적 방법, implicit
       Date day = Date(2021, 9, 2); // 명시적 방법, explicit
-  ```
+      
+    ...
+
+    ```
 
 #### 디폴트 생성자 (default constructor)
 * 생성자 중에서 전달인자를 사용하지 않는 생성자
