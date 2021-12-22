@@ -147,13 +147,13 @@ void Date::add_year(int num) {
   year_ += num;
 }
 
-void Date::show_date(void) {
+void Date::show_date() {
   std::cout << "Year: " << year_ 
             << ", Month: " << month_ 
             << ", Day: " << day_ << std::endl;
 }
 
-bool Date::is_leap_year(void) { 
+bool Date::is_leap_year() { 
   return (year_ % 4 == 0 && year_ % 100 != 0) ||
          (year_ % 400 == 0); 
 }
@@ -191,9 +191,9 @@ int main() {
 ```cpp
 class Test {
  public:
-  Test(void) = default;
+  Test() = default;
   Test(char, int, double);
-  ~Test(void) = default;
+  ~Test() = default;
  private:
   char c_;
   int i_;
@@ -209,7 +209,7 @@ Test::Test(char c, int i, double d) {
 */
 Test::Test(char c, int i, double d) : c_{c}, i_{i}, d_{d} {}
 
-int main(void) {
+int main() {
   Test test('a', 2, 3.14);
 
   return 0;
