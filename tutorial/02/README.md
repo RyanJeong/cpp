@@ -3,7 +3,7 @@
 * 표현식 `int& a = i;`이 주어졌을 때, `a`는 `i`의 레퍼런스
   * `a`는 `i`의 또 다른 이름으로써 사용할 것임을 컴파일러에 알림
   * 레퍼런스를 대상으로 어떠한 연산을 수행하면, 해당 레퍼런스가 가리키는 대상에 연산을 수행하는 것과 동일한 결과를 수행
-* 포인터와 상당히 유사하나, 몇 가지 차이를 보임:
+* 포인터와 유사하나, 몇 가지 차이를 보임:
   * 레퍼런스는 반드시 대상이 될 이름이 있어야 함:
     ```c++
     int& ref;  // error!
@@ -28,7 +28,7 @@
     int& ref = a;   // do not take up memory; replace 'ref' with 'a'
     ```
 
-  * 어떤 함수의 매개변수가 포인터라면 이는 메모리 상에 할당되지만, 어떤 함수의 매개변수가 레퍼런스라면 이는 메모리에 할당되지 않고 레퍼런스의 대상으로 치환됨:
+  * Call stack이 전환되는 경우, 레퍼런스는 메모리에 존재함<br>(레퍼런스가 가리키는 대상에 접근하기 위해 해당 메모리 주소를 기록할 공간 필요):
     ```cpp
     #include <iostream>
 
@@ -144,7 +144,8 @@
   There shall be no references to references, no arrays of references, and no pointers to references
 
   * 배열 이름은 배열 시작 주소를 가리키며, 배열 이름을 사용해 첨자 연산, 또는 포인터 연산을 통해 각 요소에 접근할 수 있음
-  *  레퍼런스의 배열은 각 요소들의 주소가 선형(linear)하다는 보장이 없으며, 따라서 위 연산들을 사용할 수 없음
+  * <b>레퍼런스는 주소를 갖지 않을 수 있으므로</b>, 위 연산들을 사용할 수 없으므로 위법
+    * 또한, 레퍼런스의 배열은 각 요소들의 주소가 선형(linear)하다는 보장이 없으며, 따라서 위 연산들을 사용할 수 없음
 
 * 배열의 레퍼런스는 사용 가능:
   ```cpp
@@ -154,9 +155,93 @@
   int (&ref2)[3][2] = b;
   ```
   * `ref1`는 `a`를 가리키는 레퍼런스
+    * 레퍼런스는 배열의 이름을 주소로써 가리킴
   * 포인터와는 다르게 레퍼런스는 <b>크기</b>가 같이 명시되어야 함 (Is it linear?)
 
+### 레퍼런스를 반환하는 함수
+* 지역변수의 레퍼런스 반환:
+  ```cpp
+  int& func() {
+    int a = 3;
 
+    return a;
+  }
+
+  int main() {
+    int b = func();  // ERROR! segmentation fault
+    b = 3;
+
+    return 0;
+  }
+  ```
+  * `func` 함수는 종료됨과 동시에 지역변수 `a` 소멸
+  * `func` 함수가 반환하는 레퍼런스는 지역변수 `a`를 가리키고 있는 상태
+  * `int b = func();` 문장이 처리될 때, 지역변수 `b`에 이미 소멸된 값을 복사함
+    * <i>dangling reference</i>, segmentation fault
+
+* 외부변수의 레퍼런스 반환:
+  ```cpp
+  int& func(int& a) {
+    a = 5;
+    
+    return a;
+  }
+
+  int main() {
+    int x = 2;
+    int y = func(x);  // OK!
+    y = 4;
+
+    return 0;
+  }
+  ```
+  * `func` 함수의 매개변수는 지역변수 `x`를 가리키는 레퍼런스
+  * `func` 함수가 반환하는 레퍼런스는 지역변수 `x`를 가리키고 있는 상태
+  * `int y = func(x);` 문장이 처리될 때, 지역변수 `y`에 지역변수 `x`의 값을 복사함
+
+* 지역변수의 값 반환:
+  ```cpp
+  int func() {
+    int a = 5;
+
+    return a;
+  }
+
+  int main() {
+    int& c = func();
+
+    return 0;
+  }
+  ```
+  * `func` 함수는 종료됨과 동시에 지역변수 `a` 소멸
+  * `int& c = func();` 문장이 처리될 때, 레퍼런스 `c`에 이미 소멸된 대상을 가리킴
+    * <i>dangling reference</i>
+
+* 지역변수의 값 반환 시 생명 연장:
+  ```cpp
+  int func() {
+    int a = 5;
+
+    return a;
+  }
+
+  int main() {
+    const int& x = func();
+
+    return 0;
+  }
+  ```
+  * `func` 함수는 종료됨과 동시에 지역변수 `a` 소멸
+  * `const` 키워드를 사용해 지역변수 `a`의 생명을 연장시킬 수 있음
+    * 소멸 시점을 미룰 수 있음
+  * `const int& x = func();` 문장이 처리될 때, 레퍼런스 `x`는 `const` 키워드에 의해 생명이 연장된 지역변수 `a`를 가리킴
+    * 지역변수 `a`는 레퍼런스가 소멸될 때 같이 소멸
+
+### 레퍼런스의 메모리 필요 유무
+> In CPP 8.3.2 References §4, It is unspecified whether or not a reference requires storage
+* Call stack이 전환될 경우, 대상의 주소를 보관하기 위한 메모리 필요 
+  * if a reference needs storage, it typically needs as much storage as a pointer
+* 동일한 call stack 내에서는 컴파일러가 레퍼런스를 레퍼런스의 대상으로 즉시 치환 가능하므로, 메모리 불필요
 
 ###### [뒤로가기](/tutorial/#index)
 ---
