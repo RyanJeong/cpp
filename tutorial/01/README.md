@@ -1,5 +1,8 @@
 # C++ Tutorial
 ## 01 - `namespace`
+###### [뒤로가기](/tutorial/#index)
+---
+### `namespace`
 * 사용하고자 하는 대상의 <b>소속</b>을 구분하기 위해 사용
 * 프로그램 규모가 커짐에 따라 중복된 이름을 가진 구현체(함수 등)의 수가 늘어나게 되었고, 이를 효율적으로 구분하여 사용하기 위해 <b>이름 공간(`namespace`)</b> 개념을 도입하게 됨
 * `std::cout`은 `std`라는 이름 공간에 속해 있는 `cout`을 사용한다는 의미 
@@ -104,10 +107,6 @@
         return 0;
       }
       ```
-
-###### [뒤로가기](/tutorial/#index)
----
-### SUBTITLE
 
 ###### [처음으로](#c-tutorial)
 ###### [뒤로가기](/tutorial/#index)

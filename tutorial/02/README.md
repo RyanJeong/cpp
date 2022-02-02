@@ -1,5 +1,8 @@
 # C++ Tutorial
 ## 02 - `reference`
+###### [뒤로가기](/tutorial/#index)
+---
+### `reference`
 * 표현식 `int& a = i;`이 주어졌을 때, `a`는 `i`의 레퍼런스
   * `a`는 `i`의 또 다른 이름으로써 사용할 것임을 컴파일러에 알림
   * 레퍼런스를 대상으로 어떠한 연산을 수행하면, 해당 레퍼런스가 가리키는 대상에 연산을 수행하는 것과 동일한 결과를 수행
@@ -242,10 +245,6 @@
 * Call stack이 전환될 경우, 대상의 주소를 보관하기 위한 메모리 필요 
   * if a reference needs storage, it typically needs as much storage as a pointer
 * 동일한 call stack 내에서는 컴파일러가 레퍼런스를 레퍼런스의 대상으로 즉시 치환 가능하므로, 메모리 불필요
-
-###### [뒤로가기](/tutorial/#index)
----
-### SUBTITLE
 
 ###### [처음으로](#c-tutorial)
 ###### [뒤로가기](/tutorial/#index)

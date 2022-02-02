@@ -20,6 +20,7 @@ class Coord {
   Coord(int x, int y);
   ~Coord();
   void print_total_num();
+
  private:
   const int x_, y_;
   static int total_num;

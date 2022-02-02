@@ -1,5 +1,7 @@
 # C++ Tutorial
 ## 07 - `const`, `static`
+###### [뒤로가기](/tutorial/#index)
+---
 ### 생성자 초기화 리스트(initializer list)
 * 생성자를 이용한 일반적인 초기화 방법:
   ```cpp
@@ -265,12 +267,41 @@
   }
 
   ```
+
+### `const` 함수
+* 멤버변수의 값을 바꾸지 않고 읽기만 하는 함수(상수함수)
+* 상수 인스턴스(a const instance)는 상수함수만 호출 가능하며, 상수함수 내에서 다른 함수를 호출하고자 할 때 마찬가지로 상수함수만 호출 가능:
+  ```cpp
+  #include <iostream>
+
+  class Coord {
+   public:
+    Coord() = default;
+    Coord(int x, int y);
+    ~Coord() = default;
+    int get_x() const;
+    int get_y() const;
+
+   private:
+    const int x_, y_;
+  };
+
+  Coord::Coord(int x, int y) : x_{x}, y_{y} {}
+
+  int Coord::get_x() const { return x_; } // 인스턴스 변수 읽기만 가능
+  int Coord::get_y() const { return y_; } // 인스턴스 변수 읽기만 가능
+
+  int main() {
+    Coord c1{3, 4};
+    Coord c2{5, 6};
+
+    std::cout << c1.get_x() << ' ' << c1.get_y() << '\n';
+    std::cout << c2.get_x() << ' ' << c2.get_y() << '\n';
+
+    return 0;
+  }
+  ```
   
-###### [뒤로가기](/tutorial/#index)
-
----
-### SUBTITLE
-
 ###### [처음으로](#c-tutorial)
 ###### [뒤로가기](/tutorial/#index)
 ---

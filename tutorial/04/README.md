@@ -1,5 +1,7 @@
 # C++ Tutorial
 ## 04 - 객체지향프로그래밍 1
+###### [뒤로가기](/tutorial/#index)
+---
 ### 객체(<i>object</i>)
 * 절차지향적인 방법으로 구조체 형 변수를 대상으로 연산을 수행하고자 할 때:
   ```cpp
@@ -151,10 +153,6 @@
     return 0;
   } 
   ```
-
-###### [뒤로가기](/tutorial/#index)
----
-### SUBTITLE
 
 ###### [처음으로](#c-tutorial)
 ###### [뒤로가기](/tutorial/#index)

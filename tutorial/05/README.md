@@ -1,5 +1,7 @@
 # C++ Tutorial
 ## 05 - 객체지향프로그래밍 2
+###### [뒤로가기](/tutorial/#index)
+---
 ### 오버로딩(<i>overloading</i>)
 * 같은 이름의 함수를 여러 개 정의해 사용하는 것(overload):
   ```cpp
@@ -263,9 +265,6 @@
   }
 
   ```
-###### [뒤로가기](/tutorial/#index)
----
-### SUBTITLE
 
 ###### [처음으로](#c-tutorial)
 ###### [뒤로가기](/tutorial/#index)
