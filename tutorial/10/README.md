@@ -505,7 +505,7 @@
 
   ```
 
-### [WIP]타입 변환 연산자 오버로딩
+### 타입 변환 연산자 오버로딩
 * 기본 자료형을 객체로써 사용해야 할 경우, 이를 클래스로 포장해서 각각의 자료형을 객체로 사용해야 함
 * 기본 자료형을 객체로써 사용할 수 있도록 하는 클래스를 wrapper 클래스라 함:
   ```cpp
@@ -520,6 +520,147 @@
   };
 
   ```
+  * `Int`를 `int`처럼 사용하려면 연산자 오버로딩을 <b>직접, 일일이</b> 구현해야 할까?
+
+* 타입 변환 연산자는 다음과 같이 정의:
+  ```cpp
+  operator (TYPE)()
+  ```
+  * 생성자 혹은 소멸자처럼 반환형을 사용하지 않음
+
+  ```cpp
+  operator (int)()
+  ```
+  * 객체를 `int` 형으로써 간주
+
+  ```cpp
+  operator int() { return data; }
+  ```
+  * 객체를 대상으로 `읽는` 연산을 할 경우, `data`를 `int`형으로 변환 후 반환
+  * 객체를 대상으로 `댕립` 연산을 할 경우, 디폴트 대입 연산자가 타입 변환 연산자를 참고해 적절히 변환 후 처리
+
+* `Int` wrapper 클래스에 타입 변환 연산자를 사용:
+  ```cpp
+  #include <iostream>
+
+  class Int {
+    int data;
+    // some other data
+
+  public:
+    Int(int data) : data(data) {}
+    Int(const Int& i) : data(i.data) {}
+
+    operator int() { return data; }
+  };
+  int main() {
+    Int x = 3;
+    int a = x + 4;
+
+    x = a * 2 + x + 4;
+    std::cout << x << std::endl;
+  }
+  ```
+
+* 여러 개의 타입 변환 연산자:
+  ```cpp
+  #include <iostream>
+
+  class Test {
+  private:
+    char c_;
+    int i_;
+    double d_;
+
+  public:
+    Test(char c, int i, double d) : c_(c), i_(i), d_(d) { }
+    operator char() const;
+    operator int() const;
+    operator double() const;
+  };
+
+  Test::operator char() const {
+    std::cout << "operator char()" << std::endl;
+    return c_;
+  }
+
+  Test::operator int() const {
+    std::cout << "operator int()" << std::endl;
+    return i_;
+  }
+
+  Test::operator double() const {
+    std::cout << "operator double()" << std::endl;
+    return d_;
+  }
+
+  int main() {
+    Test test('x', 16, 3.14);
+    char c = test;
+    int i = test;
+    double d = test;
+
+    std::cout << c << ' ' << i << ' ' << d << std::endl;
+
+    return 0;
+  }
+
+  ```
+
+### 증감 연산자 오버로딩
+* 전위 증감 연산자와 후위 증감 연산자는 매개변수 형태에 따라 구분:
+  ```cpp
+  operator++();       // 전위 증가
+  operator--();       // 전위 감소
+  operator++(int x);  // 후위 증가
+  operator--(int x);  // 후위 감소
+  ```
+* <b>전위 증감 연산자의 반환형은 자기 자신의 레퍼런스, 후위 증감 연산자의 반환형은 값이 바뀌기 전의 객체를 반환해야 함</b>:
+  ```cpp
+  #include <iostream>
+
+  class Test {
+    int data_;
+
+  public:
+    Test(int data) : data_(data) {}  // [NOLINT]
+    Test(const Test& t) : data_(t.data_) {}
+
+    Test& operator++() {
+      data_++;
+      std::cout << "전위 증감 연산자" << std::endl;
+      return *this;
+    }
+
+    // 전위 증감과 후위 증감에 차이를 두기 위해 후위 증감의 경우 인자로 int 를
+    // 받지만 실제로는 아무것도 전달되지 않는다.
+    Test operator++(int) {
+      Test temp(*this);
+      data_++;
+      std::cout << "후위 증감 연산자" << std::endl;
+      return temp;
+    }
+
+    int get_x() const {
+      return data_;
+    }
+  };
+
+  void func(const Test& t) {
+    std::cout << "x : " << t.get_x() << std::endl;
+  }
+
+  int main() {
+    Test t(3);
+
+    func(++t);  // 4
+    func(t++);  // 4 가 출력됨
+    std::cout << "x : " << t.get_x() << std::endl;
+  }
+
+  ```
+
+### [What are the basic rules and idioms for operator overloading?](https://stackoverflow.com/questions/4421706/what-are-the-basic-rules-and-idioms-for-operator-overloading)
 
 ###### [처음으로](#c-tutorial)
 ###### [뒤로가기](/tutorial/#index)
