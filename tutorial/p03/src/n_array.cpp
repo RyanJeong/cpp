@@ -7,51 +7,51 @@ class Int;
 class Array {
   friend Int;
 
-  const int dim;  // 몇 차원 배열 인지
-  int* size;  // size[0] * size[1] * ... * size[dim - 1] 짜리 배열이다.
+  const int dim_;  // 몇 차원 배열 인지
+  int* size_;  // size[0] * size[1] * ... * size[dim - 1] 짜리 배열이다.
 
   struct Address {
-    int level;
+    int level_;
     // 맨 마지막 레벨(dim - 1 레벨) 은 데이터 배열을 가리키고, 그 위 상위
     // 레벨에서는 다음 Address 배열을 가리킨다.
-    void* next;
+    void* next_;
   };
 
-  Address* top;
+  Address* top_;
 
  public:
   class Iterator {
-    int* location;
-    Array* arr;
+    int* location_;
+    Array* array_;
 
     friend Int;
 
    public:
-    Iterator(Array* arr, int* loc = NULL) : arr(arr) {
-      location = new int[arr->dim];
-      for (int i = 0; i != arr->dim; i++)
-        location[i] = (loc != NULL ? loc[i] : 0);
+    Iterator(Array* arr, int* loc = NULL) : array_(arr) {
+      location_ = new int[arr->dim_];
+      for (int i = 0; i != arr->dim_; i++)
+        location_[i] = (loc != NULL ? loc[i] : 0);
     }
-    Iterator(const Iterator& itr) : arr(itr.arr) {
-      location = new int[arr->dim];
-      for (int i = 0; i != arr->dim; i++)
-        location[i] = itr.location[i];
+    Iterator(const Iterator& itr) : array_(itr.array_) {
+      location_ = new int[array_->dim_];
+      for (int i = 0; i != array_->dim_; i++)
+        location_[i] = itr.location_[i];
     }
-    ~Iterator() { delete[] location; }
+    ~Iterator() { delete[] location_; }
     // 다음 원소를 가리키게 된다.
     Iterator& operator++() {
-      if (location[0] >= arr->size[0])
+      if (location_[0] >= array_->size_[0])
         return (*this);
 
       bool carry = false;  // 받아 올림이 있는지
-      int i = arr->dim - 1;
+      int i = array_->dim_ - 1;
       do {
         // 어차피 다시 돌아온다는 것은 carry 가 true
         // 라는 의미 이므로 ++ 을 해야 한다.
-        location[i]++;
-        if (location[i] >= arr->size[i] && i >= 1) {
+        location_[i]++;
+        if (location_[i] >= array_->size_[i] && i >= 1) {
           // i 가 0 일 경우 0 으로 만들지 않는다 (이러면 begin 과 중복됨)
-          location[i] -= arr->size[i];
+          location_[i] -= array_->size_[i];
           carry = true;
           i--;
         } else
@@ -62,10 +62,10 @@ class Array {
       return (*this);
     }
     Iterator& operator=(const Iterator& itr) {
-      arr = itr.arr;
-      location = new int[itr.arr->dim];
-      for (int i = 0; i != arr->dim; i++)
-        location[i] = itr.location[i];
+      array_ = itr.array_;
+      location_ = new int[itr.array_->dim_];
+      for (int i = 0; i != array_->dim_; i++)
+        location_[i] = itr.location_[i];
 
       return (*this);
     }
@@ -75,11 +75,11 @@ class Array {
       return itr;
     }
     bool operator!=(const Iterator& itr) {
-      if (itr.arr->dim != arr->dim)
+      if (itr.array_->dim_ != array_->dim_)
         return true;
 
-      for (int i = 0; i != arr->dim; i++)
-        if (itr.location[i] != location[i]) return true;
+      for (int i = 0; i != array_->dim_; i++)
+        if (itr.location_[i] != location_[i]) return true;
 
       return false;
     }
@@ -87,38 +87,38 @@ class Array {
   };
 
   friend Iterator;
-  Array(int dim, int* array_size) : dim(dim) {
-    size = new int[dim];
+  Array(int dim, int* array_size) : dim_(dim) {
+    size_ = new int[dim];
     for (int i = 0; i < dim; i++)
-      size[i] = array_size[i];
+      size_[i] = array_size[i];
 
-    top = new Address;
-    top->level = 0;
+    top_ = new Address;
+    top_->level_ = 0;
 
-    initialize_address(top);
+    initialize_address(top_);
   }
-  Array(const Array& arr) : dim(arr.dim) {
-    size = new int[dim];
-    for (int i = 0; i < dim; i++)
-      size[i] = arr.size[i];
+  Array(const Array& arr) : dim_(arr.dim_) {
+    size_ = new int[dim_];
+    for (int i = 0; i < dim_; i++)
+      size_[i] = arr.size_[i];
 
-    top = new Address;
-    top->level = 0;
+    top_ = new Address;
+    top_->level_ = 0;
 
-    initialize_address(top);
+    initialize_address(top_);
     // 내용물 복사
-    copy_address(top, arr.top);
+    copy_address(top_, arr.top_);
   }
 
   void copy_address(Address* dst, Address* src) {
-    if (dst->level == dim - 1) {
-      for (int i = 0; i < size[dst->level]; ++i)
-        static_cast<int*>(dst->next)[i] = static_cast<int*>(src->next)[i];
+    if (dst->level_ == dim_ - 1) {
+      for (int i = 0; i < size_[dst->level_]; ++i)
+        static_cast<int*>(dst->next_)[i] = static_cast<int*>(src->next_)[i];
       return;
     }
-    for (int i = 0; i != size[dst->level]; i++) {
-      Address* new_dst = static_cast<Address*>(dst->next) + i;
-      Address* new_src = static_cast<Address*>(src->next) + i;
+    for (int i = 0; i != size_[dst->level_]; i++) {
+      Address* new_dst = static_cast<Address*>(dst->next_) + i;
+      Address* new_src = static_cast<Address*>(src->next_) + i;
       copy_address(new_dst, new_src);
     }
   }
@@ -127,38 +127,38 @@ class Array {
   void initialize_address(Address* current) {
     if (!current)
       return;
-    if (current->level == dim - 1) {
-      current->next = new int[size[current->level]];
+    if (current->level_ == dim_ - 1) {
+      current->next_ = new int[size_[current->level_]];
       return;
     }
-    current->next = new Address[size[current->level]];
-    for (int i = 0; i != size[current->level]; i++) {
-      (static_cast<Address*>(current->next) + i)->level = current->level + 1;
-      initialize_address(static_cast<Address*>(current->next) + i);
+    current->next_ = new Address[size_[current->level_]];
+    for (int i = 0; i != size_[current->level_]; i++) {
+      (static_cast<Address*>(current->next_) + i)->level_ = current->level_ + 1;
+      initialize_address(static_cast<Address*>(current->next_) + i);
     }
   }
   void delete_address(Address* current) {
     if (!current)
       return;
-    for (int i = 0; current->level < dim - 1 && i < size[current->level]; i++) {
-      delete_address(static_cast<Address*>(current->next) + i);
+    for (int i = 0; current->level_ < dim_ - 1 && i < size_[current->level_]; i++) {
+      delete_address(static_cast<Address*>(current->next_) + i);
     }
 
-    if (current->level == dim - 1) {
-      delete[] static_cast<int*>(current->next);
+    if (current->level_ == dim_ - 1) {
+      delete[] static_cast<int*>(current->next_);
       return; // return need to be added, otherwise error.  
     }
-    delete[] static_cast<Address*>(current->next);
+    delete[] static_cast<Address*>(current->next_);
   }
   Int operator[](const int index);
   ~Array() {
-    delete_address(top);
-    delete[] size;
+    delete_address(top_);
+    delete[] size_;
   }
 
   Iterator begin() {
-    int* arr = new int[dim];
-    for (int i = 0; i != dim; i++)
+    int* arr = new int[dim_];
+    for (int i = 0; i != dim_; i++)
       arr[i] = 0;
 
     Iterator temp(this, arr);
@@ -167,9 +167,9 @@ class Array {
     return temp;
   }
   Iterator end() {
-    int* arr = new int[dim];
-    arr[0] = size[0];
-    for (int i = 1; i < dim; i++)
+    int* arr = new int[dim_];
+    arr[0] = size_[0];
+    for (int i = 1; i < dim_; i++)
       arr[i] = 0;
 
     Iterator temp(this, arr);
@@ -187,18 +187,18 @@ class Int {
  public:
   Int(int index, int _level = 0, void* _data = NULL, Array* _array = NULL)
       : level(_level), data(_data), array(_array) {
-    if (_level < 1 || index >= array->size[_level - 1]) {
+    if (_level < 1 || index >= array->size_[_level - 1]) {
       data = NULL;
       return;
     }
-    if (level == array->dim) {
+    if (level == array->dim_) {
       // 이제 data 에 우리의 int 자료형을 저장하도록 해야 한다.
       data = static_cast<void*>((
-          static_cast<int*>(static_cast<Array::Address*>(data)->next) + index));
+          static_cast<int*>(static_cast<Array::Address*>(data)->next_) + index));
     } else {
       // 그렇지 않을 경우 data 에 그냥 다음 addr 을 넣어준다.
       data = static_cast<void*>(static_cast<Array::Address*>(
-                                    static_cast<Array::Address*>(data)->next) +
+                                    static_cast<Array::Address*>(data)->next_) +
                                 index);
     }
   };
@@ -223,12 +223,12 @@ class Int {
   }
 };
 Int Array::operator[](const int index) {
-  return Int(index, 1, static_cast<void*>(top), this);
+  return Int(index, 1, static_cast<void*>(top_), this);
 }
 Int Array::Iterator::operator*() {
-  Int start = arr->operator[](location[0]);
-  for (int i = 1; i <= arr->dim - 1; i++) {
-    start = start.operator[](location[i]);
+  Int start = array_->operator[](location_[0]);
+  for (int i = 1; i <= array_->dim_ - 1; i++) {
+    start = start.operator[](location_[i]);
   }
   return start;
 }
