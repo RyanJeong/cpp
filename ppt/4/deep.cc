@@ -15,16 +15,19 @@ limitations under the License.
 #include <iostream>
 #include <cstring>
 
+// Deep copy copies what a pointer points to so that the two pointers now refer
+// to distinct objects. We define copy constructors and copy assignments when we
+// want deep copy for objects of our classes.
 class DeepString {
  public:
   explicit DeepString(const char* s) {
-    data_ = new char[strlen(s)+1];
-    strncpy(data_, s, strlen(s));
+    data_ = new char[std::strlen(s)+1];
+    std::strncpy(data_, s, std::strlen(s));
   }
   // Copy constructor (deep copy)
   DeepString(const DeepString& str) {
-    data_ = new char[strlen(str.data_)+1];
-    strncpy(data_, str.data_, strlen(str.data_));
+    data_ = new char[std::strlen(str.data_)+1];
+    std::strncpy(data_, str.data_, std::strlen(str.data_));
   }
   ~DeepString() { delete[] data_; }
 

@@ -15,11 +15,13 @@ limitations under the License.
 #include <iostream>
 #include <cstring>
 
+// Shallow copy copies only a pointer so that the two pointers now refer to the
+// same object. That’s what pointers and references do.
 class ShallowString {
  public:
   explicit ShallowString(const char* s) {
-    data_ = new char[strlen(s)+1];
-    strncpy(data_, s, strlen(s));
+    data_ = new char[std::strlen(s)+1];
+    std::strncpy(data_, s, std::strlen(s));
   }
   // Copy constructor (shallow copy)
   // NOTICE: Group 2(Copy constructor) is missing,
