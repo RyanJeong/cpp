@@ -12,24 +12,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "student.hpp"  // [NOLINT]
+#pragma once
 
-#include <iostream>
+#include <string>
 
-Student::Student(const std::string& nm) : name_(nm) {
-  schedule_ = new StudentSchedule;
-}
+class Tokenizer {
+  std::string target_;
+  std::string delim_;
+  int begin_;
+  int end_;
 
-std::string Student::get_name() const { return name_; }
-
-StudentSchedule* Student::get_schedule() const { return schedule_; }
-
-void Student::add_course(const std::string& name) {
-  schedule_->add_course(name);
-}
-
-void Student::print() const {
-  std::cout << "Student name: " << name_ << std::endl;
-  schedule_->print();
-}
-
+ public:
+  Tokenizer(const std::string& target, const std::string& delim);
+  ~Tokenizer() = default;
+  bool more_token() const;
+  std::string next_token();
+};

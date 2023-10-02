@@ -12,24 +12,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "student.hpp"  // [NOLINT]
+#include "product.hpp"  // [NOLINT]
 
-#include <iostream>
+Product::Product(const std::string& name, double price)
+    : name_(name), unit_price_(price) {}
 
-Student::Student(const std::string& nm) : name_(nm) {
-  schedule_ = new StudentSchedule;
-}
-
-std::string Student::get_name() const { return name_; }
-
-StudentSchedule* Student::get_schedule() const { return schedule_; }
-
-void Student::add_course(const std::string& name) {
-  schedule_->add_course(name);
-}
-
-void Student::print() const {
-  std::cout << "Student name: " << name_ << std::endl;
-  schedule_->print();
-}
+double Product::get_price ( ) const { return unit_price_; }
 

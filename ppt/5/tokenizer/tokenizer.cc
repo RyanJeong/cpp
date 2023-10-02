@@ -12,24 +12,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "student.hpp"  // [NOLINT]
+#include "tokenizer.hpp"  // [NOLINT]
 
-#include <iostream>
-
-Student::Student(const std::string& nm) : name_(nm) {
-  schedule_ = new StudentSchedule;
+Tokenizer::Tokenizer(const std::string& tar, const std::string& del)
+    : target_(tar), delim_(del) {
+  begin_ = target_.find_first_not_of(delim_, 0);
+  end_ = target_.find_first_of(delim_, begin_);
 }
 
-std::string Student::get_name() const { return name_; }
+bool Tokenizer::more_token() const { return (begin_ != std::string::npos); }
 
-StudentSchedule* Student::get_schedule() const { return schedule_; }
-
-void Student::add_course(const std::string& name) {
-  schedule_->add_course(name);
-}
-
-void Student::print() const {
-  std::cout << "Student name: " << name_ << std::endl;
-  schedule_->print();
+std::string Tokenizer::next_token() {
+  std::string token = target_.substr(begin_, end_ - begin_);
+  begin_ = target_.find_first_not_of(delim_, end_);
+  end_ = target_.find_first_of(delim_, begin_);
+  return token;
 }
 

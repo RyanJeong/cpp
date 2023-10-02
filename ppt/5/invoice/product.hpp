@@ -12,24 +12,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "student.hpp"  // [NOLINT]
+#pragma once
 
-#include <iostream>
+#include <string>
 
-Student::Student(const std::string& nm) : name_(nm) {
-  schedule_ = new StudentSchedule;
-}
+class Product {
+  std::string name_;
+  double unit_price_;
 
-std::string Student::get_name() const { return name_; }
-
-StudentSchedule* Student::get_schedule() const { return schedule_; }
-
-void Student::add_course(const std::string& name) {
-  schedule_->add_course(name);
-}
-
-void Student::print() const {
-  std::cout << "Student name: " << name_ << std::endl;
-  schedule_->print();
-}
+ public:
+  Product(const std::string& name, double unit_price);
+  ~Product() = default;
+  double get_price() const;
+};
 

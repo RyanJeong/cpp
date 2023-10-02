@@ -12,24 +12,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "student.hpp"  // [NOLINT]
-
 #include <iostream>
 
-Student::Student(const std::string& nm) : name_(nm) {
-  schedule_ = new StudentSchedule;
-}
+#include "tokenizer.hpp"
 
-std::string Student::get_name() const { return name_; }
-
-StudentSchedule* Student::get_schedule() const { return schedule_; }
-
-void Student::add_course(const std::string& name) {
-  schedule_->add_course(name);
-}
-
-void Student::print() const {
-  std::cout << "Student name: " << name_ << std::endl;
-  schedule_->print();
+int main() {
+  // The target string that needs to be tokenized
+  std::string target("This is the string to be tokenized.\n");
+  // The delimit string defines the set of separators
+  std::string delimit(" \n"); // Delimiter made of ' ' and '\n'
+  // Instantiation of tokenizer object 
+  Tokenizer tokenizer(target, delimit); 
+  // Traversing the target string to find tokens 
+  while (tokenizer.more_token())
+    std::cout << tokenizer.next_token() << std::endl;
+  return 0;
 }
 
