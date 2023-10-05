@@ -26,6 +26,6 @@ class TA : public Person, public StdType, public PrfType {
   ~TA() = default;
   void print_gpa() const override;
   void print_salary() const override;
-  void print();
+  void print() const;
 };
 

@@ -23,6 +23,6 @@ class Person {
  public:
   explicit Person(const std::string& name);
   ~Person() = default;
-  void print();
+  void print() const;
 };
 

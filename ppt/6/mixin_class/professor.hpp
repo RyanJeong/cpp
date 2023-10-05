@@ -24,6 +24,6 @@ class Professor : public Person, public PrfType {
   Professor(const std::string& name, double salary);
   ~Professor() = default;
   void print_salary() const override;
-  void print();
+  void print() const;
 };
 

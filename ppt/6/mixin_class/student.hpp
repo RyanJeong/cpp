@@ -24,5 +24,6 @@ class Student : public Person, public StdType {
   Student(const std::string& name, double gpa);
   ~Student() = default;
   void print_gpa() const override;
-  void print();
+  void print() const;
 };
+

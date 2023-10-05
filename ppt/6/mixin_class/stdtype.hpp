@@ -21,3 +21,4 @@ class StdType {
  public:
   virtual void print_gpa() const = 0;
 };
+

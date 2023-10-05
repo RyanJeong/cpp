@@ -21,7 +21,7 @@ Student::Student(const std::string& name, double gp) : Person(name), gpa_(gp) {
   assert(gpa_ <= 4.0);
 }
 
-void Student::print() {
+void Student::print() const {
   std::cout << "Student " << std::endl;
   std::cout << "Name: " << name_ << " ";
   std::cout << "GPA: " << gpa_ << std::endl << std::endl;

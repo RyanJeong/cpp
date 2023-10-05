@@ -25,5 +25,6 @@ class Student: virtual public Person {
  public:
   Student(const std::string& name, double gpa);
   ~Student() = default;
-  void print();
+  void print() const;
 };
+

@@ -26,7 +26,7 @@ void Professor::print_salary() const {
   std::cout << std::fixed << std::setprecision(2) << salary_ << std::endl;
 }
 
-void Professor::print() {
+void Professor::print() const {
   Person::print();
   print_salary();
 }

@@ -18,7 +18,7 @@ limitations under the License.
 
 Person::Person(const std::string& nm) : name_(nm) {}
 
-void Person::print() {
+void Person::print() const {
   std::cout << "Person" << std::endl;
   std::cout << "Name: " << name_ << std::endl << std::endl;
 }

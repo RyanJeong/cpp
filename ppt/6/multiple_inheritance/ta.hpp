@@ -23,6 +23,6 @@ class TA : public Professor, public Student {
  public:
   TA(const std::string& name, double gpa, double sal);
   ~TA() = default;
-  void print();
+  void print() const;
 };
 

@@ -19,8 +19,9 @@ limitations under the License.
 Professor::Professor(const std::string& nm, double sal)
     : Person(nm), salary_(sal) {}
 
-void Professor::print() {
+void Professor::print() const {
   std::cout << "Professor " << std::endl;
   std::cout << "Name: " << name_ << " ";
   std::cout << "Salary: " << salary_ << std::endl << std::endl;
 }
+

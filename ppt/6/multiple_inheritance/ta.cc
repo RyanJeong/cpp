@@ -19,9 +19,10 @@ limitations under the License.
 TA::TA(const std::string& nm, double gp, double sal)
     : Person(nm), Student(nm, gp), Professor(nm, sal) {}
 
-void TA::print() {
+void TA::print() const {
   std::cout << "Teaching Assistance: " << std::endl;
   std::cout << "Name: " << name_ << " ";
   std::cout << "GPA: " << gpa_ << " ";
   std::cout << "Salary: " << salary_ << std::endl << std::endl;
 }
+

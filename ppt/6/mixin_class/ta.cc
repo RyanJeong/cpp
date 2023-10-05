@@ -31,7 +31,7 @@ void TA::print_salary() const {
   std::cout << std::fixed << std::setprecision(2) << salary_ << std::endl;
 }
 
-void TA::print() {
+void TA::print() const {
   Person::print();
   print_gpa();
   print_salary();

@@ -21,3 +21,4 @@ class PrfType {
  public:
   virtual void print_salary() const = 0;
 };
+

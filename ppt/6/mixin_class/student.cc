@@ -26,7 +26,7 @@ void Student::print_gpa() const {
             << std::endl;
 }
 
-void Student::print() {
+void Student::print() const {
   Person::print();
   print_gpa();
 }

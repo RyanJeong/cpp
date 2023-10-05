@@ -25,6 +25,6 @@ class Professor: virtual public Person {
  public:
   Professor(const std::string& name, double salary);
   ~Professor() = default;
-  void print();
+  void print() const;
 };
 
