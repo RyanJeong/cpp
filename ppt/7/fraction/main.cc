@@ -78,21 +78,32 @@ int main() {
   std::cout << "fract13 < fract14: " << std::boolalpha;
   std::cout <<(fract13 < fract14) << std::endl << std::endl;
 
-  // Using convertor constructor to create two new objects
-  Fraction fract15(5);  // Changing an integer to a fraction
-  Fraction fract16(23.45);  // Changing a double value to a fraction
-  std::cout << "fract15: " << fract15 << std::endl;
-  std::cout << "fract16: " << fract16 << std::endl << std::endl;
+  Fraction fract15 = 0;
+  fract15 = 1 + fract15;
+  std::cout << "1 + fract15: " << fract15 << std::endl;
+  fract15 = fract15 + 1;
+  std::cout << "fract15 + 1: " << fract15 << std::endl;
+  Fraction fract16 = 0.0;
+  fract16 = 1.5 + fract16;
+  std::cout << "1.5 + fract16: " << fract16 << std::endl;
+  fract16 = fract16 + 1.5;
+  std::cout << "fract16 + 1.5: " << fract16 << std::endl;
 
-  // Changing a fraction to a double
-  Fraction fract17(9, 13);
-  std::cout << "double value of fract17(9, 13): ";
-  // std::cout << std::setprecision(2) << fract17.operator double();
-  std::cout << std::setprecision(2) << static_cast<double>(fract17)
+  // Using convertor constructor to create two new objects
+  Fraction fract17(5);  // Changing an integer to a fraction
+  std::cout << "fract17: " << fract17 << std::endl;
+  Fraction fract18(23.45);  // Changing a double value to a fraction
+  std::cout << "fract18: " << fract18 << std::endl << std::endl;
+
+  // // Changing a fraction to a double
+  Fraction fract19(9, 13);
+  std::cout << "double value of fract19(9, 13): ";
+  // std::cout << std::setprecision(2) << fract19.operator double();
+  std::cout << std::setprecision(2) << static_cast<double>(fract19)
             << std::endl << std::endl;
 
-  Fraction fract18;
-  std::cin >> fract18;
-  std::cout << "fract18: " << fract18 << std::endl;
+  Fraction fract20;
+  std::cin >> fract20;
+  std::cout << "fract20: " << fract20 << std::endl;
   return 0;
 }

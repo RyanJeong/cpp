@@ -18,7 +18,7 @@ limitations under the License.
 #include <cassert>
 #include <cmath>
 
-Fraction::Fraction(int num, int den = 1) : numer_(num), denom_(den) {
+Fraction::Fraction(int num, int den) : numer_(num), denom_(den) {
   Normalize();
 }
 
@@ -34,7 +34,7 @@ Fraction::Fraction(double value) : denom_(1) {
 Fraction::Fraction() : numer_(0), denom_(1) {}
 
 // Conversion operator
-Fraction::operator double() {
+Fraction::operator double() const {
   double num = static_cast<double>(numer_);
   return (num / denom_);
 }

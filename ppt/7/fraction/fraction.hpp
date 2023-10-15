@@ -24,13 +24,13 @@ class Fraction {
   void Normalize();
 
  public:
-  Fraction(int numer, int denom);
+  Fraction(int numer, int denom = 1);  // [NOLINT] allow implicit conversion
   Fraction(double value);  // [NOLINT] allow implicit conversion
   Fraction();
   Fraction(const Fraction& fract) = default;
   ~Fraction() = default;
 
-  operator double();
+  explicit operator double() const;
   const Fraction operator+() const;
   const Fraction operator-() const;
   Fraction& operator++();
