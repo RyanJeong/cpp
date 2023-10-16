@@ -21,6 +21,6 @@ class Array {
  public:
   explicit Array(int size);
   ~Array();
-  double& operator[](int index) const;  // Accessor
-  double& operator[](int index);        // Mutator
+  double operator[](int index) const;  // Accessor
+  double& operator[](int index);       // Mutator
 };
