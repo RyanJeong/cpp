@@ -54,14 +54,14 @@ const Fraction Fraction::operator-() const {
 // Pre-increment operator
 Fraction& Fraction::operator++() {
   numer_ = numer_ + denom_;
-  this->Normalize();
+  Normalize();
   return *this;
 }
 
 // Pre-decrement operator
 Fraction& Fraction::operator--() {
   numer_ = numer_ - denom_;
-  this->Normalize();
+  Normalize();
   return *this;
 }
 
@@ -212,7 +212,7 @@ int Fraction::Gcd(int n, int m) {
 // Helper function(Normalizing a fraction)
 void Fraction::Normalize() {
   if (denom_ == 0) {
-    std::cout<< "Invalid denom_ination in fraction. Need to quit."<< std::endl;
+    std::cerr << "Invalid denomination in fraction. Need to quit."<< std::endl;
     assert(false);
   }
   if (denom_< 0) {
