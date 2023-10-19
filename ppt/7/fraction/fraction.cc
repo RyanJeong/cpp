@@ -40,13 +40,13 @@ Fraction::operator double() const {
 }
 
 // Unary plus operator
-const Fraction Fraction::operator+() const {
+Fraction Fraction::operator+() const {
   Fraction temp(+numer_, denom_);
   return temp;
 }
 
 // Unary minus operator
-const Fraction Fraction::operator-() const {
+Fraction Fraction::operator-() const {
   Fraction temp(-numer_, denom_);
   return temp;
 }
@@ -66,14 +66,14 @@ Fraction& Fraction::operator--() {
 }
 
 // Post-increment operator
-const Fraction Fraction::operator++(int) {
+Fraction Fraction::operator++(int) {
   Fraction temp(numer_, denom_);
   ++(*this);
   return temp;
 }
 
 // Post-decrement operator
-const Fraction Fraction::operator--(int) {
+Fraction Fraction::operator--(int) {
   Fraction temp(numer_, denom_);
   --(*this);
   return temp;
