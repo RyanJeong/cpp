@@ -24,12 +24,14 @@ class Fraction {
   void Normalize();
 
  public:
+  // question 1. explicit Fraction(int numer, int denom = 1);
   Fraction(int numer, int denom = 1);  // [NOLINT] allow implicit conversion
   Fraction(double value);  // [NOLINT] allow implicit conversion
   Fraction();
   Fraction(const Fraction& fract) = default;
   ~Fraction() = default;
 
+  // question 2. operator double() const;
   explicit operator double() const;
   Fraction operator+() const;
   Fraction operator-() const;
