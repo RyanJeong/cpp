@@ -33,12 +33,12 @@ class Fraction {
 
   // question 2. operator double() const;
   explicit operator double() const;
-  Fraction operator+() const;
-  Fraction operator-() const;
+  const Fraction operator+() const;
+  const Fraction operator-() const;
   Fraction& operator++();
   Fraction& operator--();
-  Fraction operator++(int);
-  Fraction operator--(int);
+  const Fraction operator++(int);
+  const Fraction operator--(int);
   Fraction& operator=(const Fraction& right);
   Fraction& operator+=(const Fraction& right);
   Fraction& operator-=(const Fraction& right);

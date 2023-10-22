@@ -40,13 +40,13 @@ Fraction::operator double() const {
 }
 
 // Unary plus operator
-Fraction Fraction::operator+() const {
+const Fraction Fraction::operator+() const {
   Fraction temp(+numer_, denom_);
   return temp;
 }
 
 // Unary minus operator
-Fraction Fraction::operator-() const {
+const Fraction Fraction::operator-() const {
   Fraction temp(-numer_, denom_);
   return temp;
 }
@@ -66,14 +66,14 @@ Fraction& Fraction::operator--() {
 }
 
 // Post-increment operator
-Fraction Fraction::operator++(int) {
+const Fraction Fraction::operator++(int) {
   Fraction temp(numer_, denom_);
   ++(*this);
   return temp;
 }
 
 // Post-decrement operator
-Fraction Fraction::operator--(int) {
+const Fraction Fraction::operator--(int) {
   Fraction temp(numer_, denom_);
   --(*this);
   return temp;
@@ -159,27 +159,27 @@ bool operator==(const Fraction& left, const Fraction& right) {
 
 // Inequality operator(friend)
 bool operator!=(const Fraction& left, const Fraction& right) {
-  return(left.numer_ * right.denom_ != right.numer_ * left.denom_);
+  return (left.numer_ * right.denom_ != right.numer_ * left.denom_);
 }
 
 // Less-than operator(friend)
 bool operator<(const Fraction& left, const Fraction& right) {
-  return(left.numer_ * right.denom_< right.numer_ * left.denom_);
+  return (left.numer_ * right.denom_< right.numer_ * left.denom_);
 }
 
 // Less-than or equal operator(friend)
 bool operator<=(const Fraction& left, const Fraction& right) {
-  return(left.numer_ * right.denom_<= right.numer_ * left.denom_);
+  return (left.numer_ * right.denom_<= right.numer_ * left.denom_);
 }
 
 // Greater-than operator(friend)
 bool operator>(const Fraction& left, const Fraction& right) {
-  return(left.numer_ * right.denom_ > right.numer_ * left.denom_);
+  return (left.numer_ * right.denom_ > right.numer_ * left.denom_);
 }
 
 // Greater-than or equal operator(friend)
 bool operator>=(const Fraction& left, const Fraction& right) {
-  return(left.numer_ * right.denom_ >= right.numer_ * left.denom_);
+  return (left.numer_ * right.denom_ >= right.numer_ * left.denom_);
 }
 
 // Extraction operator(friend)

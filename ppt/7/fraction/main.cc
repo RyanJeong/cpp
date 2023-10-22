@@ -105,5 +105,7 @@ int main() {
   Fraction fract20;
   std::cin >> fract20;
   std::cout << "fract20: " << fract20 << std::endl;
+
   return 0;
 }
+
