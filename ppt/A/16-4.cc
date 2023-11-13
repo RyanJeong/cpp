@@ -15,10 +15,10 @@ limitations under the License.
 #include <iostream>
 
 int main() {
-  int n;
-  std::cout << "Enter a line of integers and eof at the end: " << std::endl;
-  while (std::cin >> n)  // it uses operator void*()
-    std::cout << n * 2 << " ";
+  constexpr int kSize = 128;
+  char str[kSize];
+  std::cin.getline(str, kSize);  // is equal with getline(str, size, '\n');
+  std::cout << str;
   return 0;
 }
 
