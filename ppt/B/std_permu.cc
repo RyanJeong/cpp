@@ -13,28 +13,22 @@ limitations under the License.
 */
 
 #include <iostream>
-
-void move_one_disk(char start, char end) {
-  std::cout << "Move top disk from " << start << " to " << end << std::endl;
-}
-
-void towers(int num, char source, char dest, char aux) {
-  if (num == 1) {
-    move_one_disk(source, dest);
-  } else {
-    towers(num - 1, source, aux, dest);
-    move_one_disk(source, dest);
-    towers(num - 1, aux, dest, source);
-  }
-}
+#include <string>
+#include <algorithm>
 
 int main() {
-  int n;
+  std::string str1("xy");
+  std::sort(str1.begin(), str1.end());
   do {
-    std::cout << "Enter number of disks(1 to 7): ";
-    std::cin >> n;
-  } while ((n < 1) || (n > 7));
-  towers(n, 'A', 'C', 'B');
+    std::cout << str1 << " ";
+  } while (std::next_permutation(str1.begin(), str1.end()));
+  std::cout << std::endl;
+  std::string str2("bac");
+  std::sort(str2.begin(), str2.end());
+  do {
+    std::cout << str2 << " ";
+  } while (std::next_permutation(str2.begin(), str2.end()));
+
   return 0;
 }
 
