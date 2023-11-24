@@ -18,13 +18,13 @@ void swap(int* x, int* y) { int temp = *x; *x = *y; *y = temp; }
 
 int partition(int arr[], int beg, int end) {
   int pivot = arr[beg];  // Pivot element (choose first element as pivot)
-  int i = beg;
+  int i = beg + 1;
   int j = end;
-
-  while (i < j) {
-    while (arr[j] > pivot) --j;
-    while (arr[i] <= pivot) ++i;
-    if (i < j) swap(&arr[i++], &arr[j--]);
+  while (true) {
+    while (i <= j && arr[i] <= pivot) ++i;
+    while (i <= j && arr[j] >= pivot) --j;
+    if (i > j) break;
+    swap(&arr[i++], &arr[j--]);
   }
   // Swap pivot element with the rightmost element less than or equal to pivot
   swap(&arr[beg], &arr[j]);
