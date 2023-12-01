@@ -19,23 +19,24 @@ limitations under the License.
 int square_function(int x) { return x * x; }
 
 class SquareFunctor {
-public:
+ public:
   int operator()(int x) const { return x * x; }
 };
 
 int main() {
   std::vector<int> numbers = {1, 2, 3, 4, 5};
 
-  std::transform(numbers.begin(), numbers.end(), numbers.begin(), square_function);
+  std::transform(numbers.begin(), numbers.end(),
+                 numbers.begin(), square_function);
   std::cout << "Using function: ";
   for (const auto& num : numbers) std::cout << num << " ";
   std::cout << std::endl;
 
   SquareFunctor square;
-  std::transform(numbers.begin(), numbers.end(), numbers.begin(), square);
+  std::transform(numbers.begin(), numbers.end(),
+                 numbers.begin(), square);
   std::cout << "Using function object: ";
   for (const auto& num : numbers) std::cout << num << " ";
   std::cout << std::endl;
   return 0;
 }
-

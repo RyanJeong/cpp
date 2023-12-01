@@ -46,9 +46,9 @@ int main() {
   std::list<int> other_list = {10, 20, 30, 40};
   // Splice elements from other_list into my_list at a specific position
   auto pos = my_list.begin();
-  // Since lists support bidirectional iterators, it is safe and efficient to use
-  // std::advance function to move iterators by a specific number of steps. Lists
-  // allow traversal in both directions, making iterator movement possible.
+  // Since lists support bidirectional iterators, it is safe and efficient to
+  // use std::advance function to move iterators by a specific number of steps.
+  // Lists allow traversal in both directions, making iterator movement possible
   std::advance(pos, 2);
   my_list.splice(pos, other_list);
   // Output my_list after splicing

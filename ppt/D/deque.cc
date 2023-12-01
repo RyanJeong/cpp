@@ -16,16 +16,16 @@ limitations under the License.
 #include <deque>
 
 int main() {
-  std::deque<int> deq; // Declare an empty deque of integers
+  std::deque<int> deq;  // Declare an empty deque of integers
   // Adding elements to the front and back of the deque
-  deq.push_back(42); // Add 42 to the back of the deque
-  deq.push_front(99); // Add 99 to the front of the deque
+  deq.push_back(42);    // Add 42 to the back of the deque
+  deq.push_front(99);   // Add 99 to the front of the deque
   // Access the first and last elements of the deque
   std::cout << "First element of deq: " << deq.front() << std::endl;
   std::cout << "Last element of deq: " << deq.back() << std::endl;
   // Remove elements from the front and back of the deque
-  deq.pop_back(); // Remove the last element
-  deq.pop_front(); // Remove the first element
+  deq.pop_back();      // Remove the last element
+  deq.pop_front();     // Remove the first element
   // Iterate through the deque
   for (int i : deq) std::cout << i << " ";
   std::cout << std::endl;
