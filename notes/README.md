@@ -26,6 +26,7 @@ marp --pptx --theme ../theme.css README.md
 ## Index
 
 * [01 - C++기초](./01)
+* [02 - 레퍼런스](./02)
 
 ---
 
