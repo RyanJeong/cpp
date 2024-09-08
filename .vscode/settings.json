@@ -105,5 +105,7 @@
     "cfloat": "cpp",
     "climits": "cpp",
     "cstdbool": "cpp"
-  }
+  },
+  "markdown.marp.themes": ["./notes/theme.css"]
+  "editor.rulers": [80]
 }
