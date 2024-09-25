@@ -251,14 +251,14 @@ int main() {
 
 |Case|Data Variable            |Pointer Variable           |Status|
 |----|-------------------------|---------------------------|------|
-|1   |`int name = value;`      |`int* p_name = name;`      |Ok    |
-|2   |`const int name = value;`|`int* p_name = name;`      |Error |
-|3   |`int name = value;`      |`const int* p_name = name;`|Ok    |
-|4   |`const int name = value;`|`const int* p_name = name;`|Ok    |
+|1   |`int name = value;`      |`int* p_name = &name;`      |Ok    |
+|2   |`const int name = value;`|`int* p_name = &name;`      |Error |
+|3   |`int name = value;`      |`const int* p_name = &name;`|Ok    |
+|4   |`const int name = value;`|`const int* p_name = &name;`|Ok    |
 
 ---
 
-#### Case 1: `int name = value; int* p_name = name;`
+#### Case 1: `int name = value; int* p_name = &name;`
 
 * 포인터를 통한 객체와 포인터가 가리키는 객체는 수정 가능
 
@@ -267,12 +267,12 @@ name = 30;
 *p_name = 40;
 ```
 
-#### Case 2: `const int name = value; int* p_name = name;`
+#### Case 2: `const int name = value; int* p_name = &name;`
 
 * **컴파일 오류**
   * 포인터를 통한 객체는 수정 가능하나, 포인터가 가리키는 객체는 읽기 전용이므로 모순
 
-#### Case 3: `int name = value; const int* p_name = name;`
+#### Case 3: `int name = value; const int* p_name = &name;`
 
 * 포인터를 통한 객체는 읽기 전용이며, 포인터가 가리키는 객체는 수정 가능
 
@@ -281,7 +281,7 @@ name = 30;
 // *p_name = 40; //  Compile error
 ```
 
-#### Case 4: `const int name = value; const int* p_name = name;`
+#### Case 4: `const int name = value; const int* p_name = &name;`
 
 * 포인터를 통한 객체와 포인터가 가리키는 객체는 읽기 전용
 
