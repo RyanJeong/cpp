@@ -1,6 +1,12 @@
 ---
 marp: true
 theme: notes
+style: |
+    img[alt~="center"] {
+      display: block;
+      margin: 0 auto;
+    }
+math: mathjax
 ---
 
 # C++ 기초
@@ -19,7 +25,6 @@ int main() {
 ### `#include <iostream>`
 
 * C++ 표준 입출력 관련 내용들을 포함하는 헤더파일
-  * C 언어에서의 `stdio.h`
 * 확장자를 붙이지 않음
 
 ### `int main()`
@@ -36,19 +41,19 @@ int main() {
 
 * 개행 함수 (*function*)
 * 출력 버퍼에 담긴 데이터를 즉시 내보냄
-  * `std::cout << std::endl;` is equivalent to `std::cout << '\n' << std::flush;`
-  * `\n` 문자는 개행하되 출력 버퍼에 쌓임
+  * 개행 문자를 출력 버퍼로 내보낸 뒤 출력 버퍼에 그동안 축적한 데이터를 표준 출력으로 내보냄
+  * `std::cout << std::endl;` 문장은 `std::cout << '\n' << std::flush;` 문장과 동일하게 동작함
 
 ---
 
-## `namespace`
+## 이름 공간 (*Namespace*)
 
-* 사용하고자 하는 대상의 **소속**을 구분하기 위함
+* 사용하고자 하는 이름 (*name*)의 **소속**을 구분하기 위함
 * 프로그램 규모가 커짐에 따라 중복된 이름을 가진 구현체 (함수 등) 증가
-* 효율적으로 구분해 사용하기 위해 **이름 공간 (`namespace`)** 개념 도입
-  * `std::cout`: `std`라는 이름 공간에 속해 있는 `cout` 객체 (*object*) 사용
+* 효율적으로 이름을 구분하여 사용하기 위해 이름 공간 개념 도입
+  * `std::cout`: `std`라는 이름 공간에 속해 있는 `cout` 객체 사용
 
-* 함수 `foo, bar`는 서로 이름 (name)이 같지만 이름 공간에 의해 서로 구분됨:
+* 함수 `foo, bar`는 서로 이름이 같지만 이름 공간에 의해 서로 구분됨:
 
 ```cpp
 // header1.hpp
@@ -72,7 +77,7 @@ int bar();
 
 ---
 
-* 같은 이름 공간 내에서 `::` (범위지정연산자, *scope-resolution operator*) 생략 가능
+* 같은 이름 공간 내에서 범위지정연산자 (`::`, *scope-resolution operator*) 생략 가능
 
 ```cpp
 #include "header1.hpp"
@@ -84,7 +89,7 @@ int func() {
 }  // header1
 ```
 
-* `::`을 사용해 다른 이름 공간에 속한 이름 사용 가능 (e.g., 변수 사용, 함수 호출, etc.)
+* 범위지정연산자를 사용해 다른 이름 공간에 속한 이름 사용 가능 (e.g., 변수 사용, 함수 호출, etc.)
 
 ```cpp
 #include "header1.hpp"
@@ -100,7 +105,7 @@ int func() {
 
 ---
 
-* `::`을 사용하면 이름 공간에 속한 이름 직접 지정 가능
+* 범위지정연산자를 사용하면 이름 공간에 속한 이름 직접 지정 가능
 
 ```cpp
 #include "header1.hpp"
@@ -112,7 +117,7 @@ int func() {
 }
 ```
 
-* `using` 키워드를 사용해 `::` 생략 가능
+* `using` 키워드를 사용해 범위지정연산자 생략 가능
 
 ```cpp
 #include "header1.hpp"
@@ -140,12 +145,13 @@ int func() {
 
 ### `using namespace std;`
 
-* *Do not use namespace using-directives. Use using-declarations instead.*
+> Do not use namespace using-directives. Use using-declarations instead.
+
 * 표준 이름 공간 (`std`)은 명시적으로 사용 권장
   * 표준 라이브러리 내 무수히 많은 이름이 정의되어 있음
   * `using namespace std` 선언 시 이름 충돌 위험
 
-### 이름 없는 `namespace` (*anonymous namespace*)
+### 이름 없는 이름 공간 (Anonymous Namespaces)
 
 * C 언어에서의 `static` 키워드 역할
 
@@ -163,7 +169,7 @@ int main() {
 
 ---
 
-* **이름 없는 `namespace`를 포함한 헤더 파일은 두 개 이상의 소스코드 파일로부터 `include`될 수 없음**
+* **이름 없는 *namespace*를 사용하는 헤더 파일은 두 개 이상의 소스코드 파일에 포함될 수 없음**
 
 ```cpp
 // foo.hpp
