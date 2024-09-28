@@ -280,7 +280,7 @@ int main() {
   type ‘int’
   ```
 
-  * 일반 레퍼런스 (*non-const references)*는 *lvalue*만 바인딩 가능
+  * 일반 레퍼런스 (*non-const references*)는 *lvalue*만 바인딩 가능
 
 * `const int& ref = 100;`
   * `100`은 컴파일 시간에 계산이 완료되어 메모리에 실체화되지 않는 정수 리터럴
