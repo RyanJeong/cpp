@@ -77,10 +77,11 @@ math: mathjax
 
 ---
 
-## 접근 제한자 (Access Modifier)
+## 접근 지정자 (Access Specifiers)
 
 ![center h:170](Figure_7_4.png)
 
+* 접근 제한자 (access modifiers)라고도 불림
 * 데이터 멤버와 멤버 함수에 대한 접근 권한 설정
   * 클래스의 기본 멤버 접근 제한자는 `private`
   * `private` 접근 제한자 멤버는 인스턴스 내부에서만 접근 가능
@@ -136,11 +137,11 @@ void Circle::set_radius(double r) { radius_ = r; }
 
 ### 실습 - 인스턴스 사용
 
-* 객체가 사용할 수 있는 멤버는 `public` 접근 제한자가 사용된 식별자
+* 객체가 사용할 수 있는 멤버는 `public` 접근 지정자가 사용된 식별자
   * `set_radius`, `get_radius`
-* 멤버 사용은 멤버 선택 연산자 `.` (*member selection operator*) 사용
+* 멤버 사용은 멤버 선택 연산자 (`.`, *member selection operator*) 사용
   * e.g., `circle.get_radius()`
-* 객체는 `private` 접근 제한자가 사용된 식별자 (e.g., `radius_`)에 접근 불가
+* 객체는 `private` 접근 지정자가 사용된 식별자 (e.g., `radius_`)에 접근 불가
   * 멤버 함수를 통해 간접적으로 접근 및 수정 가능
   * 클래스의 멤버 함수는 해당 클래스의 이름영역 안에 속함 (access from the same class)
 
@@ -148,8 +149,7 @@ void Circle::set_radius(double r) { radius_ = r; }
 #include <iostream>
 
 class Circle {
- private:
-  double radius_;  // Data member
+  double radius_;  // Data member (using the default access specifier - private)
 
  public:  // Member functions
   void set_radius(double radius);
@@ -287,7 +287,7 @@ inline void Circle::set_radius(double r) { radius_ = r; }
 
 > Use a struct only for passive objects that carry data; everything else is a class.
 
-* 클래스 내 기본 접근 제한자는 `private`, 구조체 내 기본 접근 제한자는 `public`
+* 클래스 내 기본 접근 지정자는 `private`, 구조체 내 기본 접근 지정자는 `public`
 * **행위 없이** (*passive*) 데이터만을 표현하는 사용자 정의 형 생성 시 구조체 사용
 * 행위가 포함되면서 데이터를 같이 표현하는 사용자 정의 형 생성 시 클래스 사용
   * **C++ 구조체는 멤버 함수를 선언 및 정의해 사용할 수 있으나, 사용하지 않음을 권장**
@@ -637,7 +637,7 @@ int main() {
   * 서로 다른 메모리 영역에 할당
 * 데이터 멤버는 캡슐화 (*encapsulation*)되어야 함
   * 항상 데이터 멤버는 `private`으로 지정해야 함
-  * 객체의 데이터 멤버는 오직 멤버 함수만을 이용해 조회 및 조작해야 함 (OOP 원칙)
+    * [OOP 원칙 (Principles of Object-Oriented Programming)](https://en.wikipedia.org/wiki/Object-oriented_programming)
 
 ---
 
@@ -648,9 +648,8 @@ int main() {
 ![center](Figure_7_10.png)
 
 * 멤버 함수는 하나의 메모리 공간에 위치 ([Code segment](https://en.wikipedia.org/wiki/Code_segment))
-* 여러 접근 제한자를 사용할 수 있음
-  * 객체는 오직 `public` 멤버 함수를 사용해 데이터 멤버를 조회 및 조작해야 함
-    * [OOP 원칙 중 하나 (Principles of Object-Oriented Programming)](https://en.wikipedia.org/wiki/Object-oriented_programming)
+* 여러 접근 지정자를 사용할 수 있음
+  * 객체는 오직 `public` 멤버 함수를 통해서만 데이터 멤버를 조회 및 조작해야 함
   * 정의된 메서드만을 사용하여 `private` 데이터 멤버로의 잘못된 접근 및 연산 억제 목적
 
 ---
