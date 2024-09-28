@@ -274,12 +274,13 @@ int main() {
 ## 상수 레퍼런스
 
 * `int& ref = 100;`
-  * *non-const references* (`int&`)는 *lvalue*만 바인딩 가능
 
   ```shell
   error: cannot bind non-const lvalue reference of type ‘int&’ to an rvalue of
   type ‘int’
   ```
+
+  * 일반 레퍼런스 (*non-const references)*는 *lvalue*만 바인딩 가능
 
 * `const int& ref = 100;`
   * `100`은 컴파일 시간에 계산이 완료되어 메모리에 실체화되지 않는 정수 리터럴
@@ -343,11 +344,11 @@ int main() {
 
 ---
 
-### *lvalue*
+### 좌측값 (*Lvalue*)
 
 * 메모리 주소를 가지는 식 (*expression*)
 * 할당 연산자 (`=`)의 왼쪽에 올 수 있는 값
-* `100`과 같은 리터럴은 *rvalue*로 간주
+* `100`과 같은 리터럴은 좌측값으로 간주
 
 ```cpp
 int x = 10;  // 'x' is an lvalue, 10 is an rvalue
@@ -356,7 +357,7 @@ int* p = &x; // '&x' is an rvalue, p is an lvalue
 *p = 30;     // '*p' is an lvalue (dereferencing p gives an lvalue)
 ```
 
-### *rvalue*
+### 우측값 (*Rvalue*)
 
 * 메모리 주소를 가지지 않는 식
 * 메모리에 실체화되지 않거나, 임시로 실체화되었다가 바로 제거되는 값
