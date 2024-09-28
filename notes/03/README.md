@@ -6,6 +6,7 @@ style: |
       display: block;
       margin: 0 auto;
     }
+math: mathjax
 ---
 
 # 클래스와 생성자
@@ -185,7 +186,7 @@ double Circle::get_radius() const { return radius_; }
 ### 변경자 메서드 (Setter)
 
 * 메서드를 호출한 객체의 데이터 멤버 값을 수정하는 메서드
-  * 데이터 멤버 외에 다른 부수효과 (*side effects*)가 발생하지 않아야 함
+  * 데이터 멤버 외에 다른 부수 효과 (*side effects*)가 발생하지 않아야 함
 
 ```cpp
 void Circle::set_radius(double r) { radius_ = r; }
@@ -237,7 +238,7 @@ void Circle::set_radius(double r) { radius_ = r; }
   };  // A semicolon is needed at the end of class definition
   ```
 
-  * 위 코드는 아래처럼 `inline` 코드가 자동으로 추가되어 컴파일 수행
+  * 위 코드는 아래처럼 `inline` 키워드가 자동으로 추가되어 컴파일 수행
 
   ```cpp
   class Circle {
@@ -421,7 +422,7 @@ message : while trying to match the argument list '(long)'
   * 반환값이 없음
 * 함수 이름은 클래스 이름과 같음
 * `const` 한정자를 사용 불가
-  * 데이터 멤버 생성 과정에서 *side-effect* 발생
+  * 데이터 멤버 생성 과정에서 부수 효과 발생
 
 #### 생성자 종류
 
@@ -477,7 +478,7 @@ class Circle {
   * 반환값이 없음
 * 함수 이름은 클래스 이름과 같으나, 함수 이름 앞에 `~` 기호 사용
 * `const` 한정자를 사용 불가
-  * 데이터 멤버 소멸 과정에서 *side-effect* 발생
+  * 데이터 멤버 소멸 과정에서 부수 효과 발생
 * 생성자는 3가지 종류가 있는 반면, 소멸자는 한 가지만 존재
   * 매개변수 미사용
 
@@ -653,7 +654,7 @@ int main() {
 
 * 객체로부터 멤버 함수를 선택할 경우 `.` 연산자 사용
 * 객체를 가리키는 포인터로부터 멤버 함수를 선택할 경우 `->` 연산자 사용
-* 두 연산자의 결합 방향은 왼쪽에서 오른쪽 (`→`)
+* 두 연산자의 결합 방향은 왼쪽에서 오른쪽 (→)
 
 ---
 
@@ -692,7 +693,7 @@ Circle* this = &circle1;
 circle1.get_radius(this);
 ```
 
-* 모든 멤버 함수는 호스트 객체 (*host object*, `this` 포인터가 가리키는 대상)를 가짐
+* 모든 멤버 함수는 호스트 객체 (`this` 포인터가 가리키는 대상)를 가짐
 
 ---
 
@@ -731,10 +732,10 @@ void Circle::set_radius(double radius) { this->radius_ = radius; }
 
 ## 분할 컴파일 (*Seperate Compilation*)
 
-* 클래스 정의는 헤더 파일 (*interface*)에 작성
+* 클래스 정의는 헤더 파일 (선언부, *interface*)에 작성
   * 클래스 멤버 함수는 선언형태
   * 간단한 수준의 멤버 함수는 선언이 아닌 정의를 하기도 함 (e.g., 변경자, 접근자)
-* 클래스 멤버 함수의 정의는 소스코드 파일(*implementation*)에 작성
+* 클래스 멤버 함수의 정의는 소스코드 파일 (구현부, *implementation*)에 작성
 
 ![center](Figure_7_14.png)
 
@@ -762,9 +763,9 @@ g++ -o application *.cpp
 
 ### 헤더 가드
 
-* 헤더 파일의 내용이 여러 번 포함되는 것을 방지하는 기법
-* 헤더 가드에 사용하는 키워드는 일반적으로 해당 파일의 경로와 해당 파일의 이름 조합으로 작성
-  * 만약 `/foo/bar` 경로에 위치한 `qux.h`라면 `#define __FOO_BAR_QUX_H__`
+* 헤더 파일의 내용이 컴파일 시 여러 번 포함되는 것을 방지하는 기법
+* 헤더 가드 심볼은 일반적으로 해당 파일의 경로와 해당 파일의 이름 조합으로 작성
+  * 만약 `/foo/bar` 경로에 위치한 `qux.h`라면, `qux.h` 파일의 헤더 가드 심볼은 `#define __FOO_BAR_QUX_H__`
 
 ![center](Figure_7_16.png)
 
@@ -900,7 +901,7 @@ int main() {
     static int count_;  // static data member
   
    public:
-    // skipped …                                           	
+    // skipped ... 
   };
 
   int Rectangle::count_ = 0;  // initialization of static data member                      
