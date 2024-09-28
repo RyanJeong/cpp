@@ -1,6 +1,12 @@
 ---
 marp: true
 theme: notes
+style: |
+    img[alt~="center"] {
+      display: block;
+      margin: 0 auto;
+    }
+math: mathjax
 ---
 
 # 레퍼런스 (*Reference*)
@@ -38,7 +44,7 @@ int main() {
 
 ## 레퍼런스 소개
 
-* C++에서 변수의 별칭 (alias)을 만드는 방법
+* C++에서 변수의 별칭 (*alias*)을 만드는 방법
 * 추가적인 연산자 없이 원본 객체에 접근 가능
 
 ```cpp
@@ -86,7 +92,7 @@ x += 20;
 
 ### 레퍼런스 특징
 
-* **레퍼런스는 반드시 대상이 있어야 한다.**
+레퍼런스는 반드시 대상이 있어야 한다.
 
 ```cpp
 #include <iostream>
@@ -110,7 +116,7 @@ int main() {
 
 ---
 
-* **레퍼런스는 한 번 지정한 대상을 변경할 수 없다.**
+레퍼런스는 한 번 지정한 대상을 변경할 수 없다.
 
 ```cpp
 #include <iostream>
@@ -135,10 +141,11 @@ int main() {
 
 ---
 
-* 일반적으로 레퍼런스는 메모리 공간을 추가로 할당하지 않는다.
-  * 레퍼런스는 메모리에 실존하는 객체의 별명
-  * 컴파일러가 레퍼런스가 등장하는 위치에 레퍼런스의 대상으로 치환
-  * 메모리 불필요
+일반적으로 레퍼런스는 메모리 공간을 추가로 할당하지 않는다.
+
+* 레퍼런스는 메모리에 실존하는 객체의 별명
+
+* 컴파일러가 레퍼런스를 레퍼런스의 대상으로 치환하면 추가적인 메모리 불필요
 
 ```cpp
 #include <iostream>
@@ -166,7 +173,7 @@ int main() {
 
 ---
 
-* 몇몇 경우에서는 레퍼런스가 메모리를 추가로 할당할 수 있다.
+몇몇 경우에서는 레퍼런스가 메모리를 추가로 할당할 수 있다.
 
 ```cpp
 #include <cstdint>  // Include for uintptr_t
@@ -208,7 +215,7 @@ int main() {
 
 ---
 
-## C++에서 추가된 함수 호출 방식 - 참조에 의한 호출 (Call by *Reference*)
+## C++에서 추가된 함수 호출 방식 - 참조에 의한 호출 (Call by Reference)
 
 ```cpp
 #include <iostream>
@@ -276,18 +283,18 @@ int main() {
 
 * `const int& ref = 100;`
   * `100`은 컴파일 시간에 계산이 완료되어 메모리에 실체화되지 않는 정수 리터럴
-  * `const` 키워드를 사용해 상수 레퍼런스에 리터럴을 바인딩하면, 상수 레퍼런스가 소멸되기 전까지 리터럴을 메모리 상에 임시 객체로 유지
+  * `const` 키워드를 사용해 상수 레퍼런스에 리터럴을 바인딩하면, 상수 레퍼런스가 소멸되기 전까지 리터럴을 메모리 상에 **임시 객체**로 유지
 
 ---
 
-### 리터럴
+### 리터럴 (*Literals*)
 
 * 코드에서 직접 값 자체를 표현하는 고정된 값 (상수)
   * 정수 리터럴: `10`, `-5`, `0`
   * 부동 소수점 리터럴: `3.14`, `2.718`
   * 문자 리터럴: `'a'`, `'1'`
   * 문자열 리터럴: `"Hello, World!"`
-  * 불리언 (*boolean* type) 리터럴: `true`, `false`
+  * 불리언 (`bool`, *boolean type*) 리터럴: `true`, `false`
 
 #### 리터럴 종류에 따른 메모리 실체화 여부
 
@@ -340,7 +347,7 @@ int main() {
 
 * 메모리 주소를 가지는 식 (*expression*)
 * 할당 연산자 (`=`)의 왼쪽에 올 수 있는 값
-* `100`과 같은 리터럴 (*literal*)은 *rvalue*로 간주
+* `100`과 같은 리터럴은 *rvalue*로 간주
 
 ```cpp
 int x = 10;  // 'x' is an lvalue, 10 is an rvalue
@@ -368,21 +375,22 @@ int* p = &x;  // '&x' is an rvalue (evaluated to the address of 'x'), p is an
 
 * C++ Standard §8.3.2/4
   > There shall be no references to references, no arrays of references, and no pointers to references.
-  * **레퍼런스는 메모리에 존재하지 않을 수 있음**
-  * 레퍼런스 배열의 이름을 활용한 주소 연산 (e.g., `(arr + 1)`)이 항상 보장되지 않음
-  * C++은 레퍼런스를 대상으로 하는 레퍼런스, 레퍼런스 배열, 레퍼런스를 대상으로 하는 포인터를 허용하지 않음
 
-  ```cpp
-  int main() {
-    int x = 10;
-    int y = 20;
-    int& arr[2] = {x, y};
-  }
-  ```
+* **레퍼런스는 메모리에 존재하지 않을 수 있음**
+* 레퍼런스 배열의 이름을 활용한 주소 연산 (e.g., `(arr + 1)`)이 항상 보장되지 않음
+* C++은 레퍼런스를 대상으로 하는 레퍼런스, 레퍼런스 배열, 레퍼런스를 대상으로 하는 포인터를 허용하지 않음
 
-  ```shell
-  error: declaration of ‘arr’ as array of references
-  ```
+```cpp
+int main() {
+  int x = 10;
+  int y = 20;
+  int& arr[2] = {x, y};
+}
+```
+
+```shell
+error: declaration of ‘arr’ as array of references
+```
 
 ---
 
