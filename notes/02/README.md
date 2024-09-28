@@ -284,7 +284,9 @@ int main() {
 
 * `const int& ref = 100;`
   * `100`은 컴파일 시간에 계산이 완료되어 메모리에 실체화되지 않는 정수 리터럴
-  * `const` 키워드를 사용해 상수 레퍼런스에 리터럴을 바인딩하면, 상수 레퍼런스가 소멸되기 전까지 리터럴을 메모리 상에 **임시 객체**로 유지
+  * 상수 레퍼런스 (`const` 키워드를 사용한 레퍼런스)는 리터럴를 바인딩할 수 있음
+    * 바인딩된 리터럴은 상수 레퍼런스가 유효한 기간 동안 메모리 상에 **임시 객체**로 유지
+    * 임시 객체는 상수 레퍼런스 소멸 시점에 같이 소멸됨
 
 ---
 
@@ -347,7 +349,7 @@ int main() {
 ### 좌측값 (*Lvalue*)
 
 * 메모리 주소를 가지는 식 (*expression*)
-* 할당 연산자 (`=`)의 왼쪽에 올 수 있는 값
+* 할당 연산자 (`=`, *assignment operator*)의 왼쪽에 올 수 있는 값
 * `100`과 같은 리터럴은 좌측값으로 간주
 
 ```cpp
@@ -378,8 +380,11 @@ int* p = &x;  // '&x' is an rvalue (evaluated to the address of 'x'), p is an
   > There shall be no references to references, no arrays of references, and no pointers to references.
 
 * **레퍼런스는 메모리에 존재하지 않을 수 있음**
-* 레퍼런스 배열의 이름을 활용한 주소 연산 (e.g., `(arr + 1)`)이 항상 보장되지 않음
-* C++은 레퍼런스를 대상으로 하는 레퍼런스, 레퍼런스 배열, 레퍼런스를 대상으로 하는 포인터를 허용하지 않음
+  * 레퍼런스 배열의 이름을 활용한 주소 연산 (e.g., `(arr + 1)`)이 항상 보장되지 않음
+* 따라서 다음 종류의 레퍼런스를 허용하지 않음:
+  * 레퍼런스에 대한 레퍼런스 (references to references)
+  * 레퍼런스 배열 (arrays of references)
+  * 레퍼런스에 대한 포인터 (pointers to references)
 
 ```cpp
 int main() {
@@ -395,12 +400,13 @@ error: declaration of ‘arr’ as array of references
 
 ---
 
-### 배열 레퍼런스
+### 배열 레퍼런스 (References to Arrays)
 
-* 이미 실체화된 배열에 대한 레퍼런스 (배열 레퍼런스)는 사용 가능
+* **이미 실체화된 배열**을 가리키는 레퍼런스 (배열 레퍼런스)는 사용 가능
 * **배열 레퍼런스의 형과 크기는 가리키는 대상과 일치해야 함**
-* `&` (*reference declaration*)의 우선 순위가 `[]` (*array size specifier*)보다 우선순위가 낮으므로 괄호 필요
-  * C 언어에서의 함수 포인터 사용 시 괄호를 필요로 하는 것과 같음
+* 레퍼런스 선언자 (`&`, *reference declaration*)와 이름을 함께 괄호로 묶어야 함
+  * 배열 크기 지시자 (`[]`, *array size specifier*)의 우선 순위가 더 높음
+  * **괄호를 사용하지 않는다면 컴파일러는 선언식을 레퍼런스 배열로 처리**
 
 ```cpp
 int arr[2][3] = {1, 2, 3, 4, 5, 6};
@@ -450,7 +456,7 @@ int main() {
 
 * 함수 지역 객체를 레퍼런스로 반환 - 이를 일반 객체로 받는 경우
   * `main` 함수 변수들은 이미 소멸된 객체 (`temp`)로부터 값 복사 시도
-  * **Segmentation fault** (dangling reference)
+    * **Segmentation fault** (dangling reference)
 
 ```cpp
 int& f() {
@@ -469,8 +475,9 @@ int main() {
 
 * 함수 지역 객체를 레퍼런스로 반환 - 이를 레퍼런스로 받는 경우
   * `main` 함수 레퍼런스의 대상은 이미 소멸된 `temp`
-  * **Undefined behavior** (dangling reference)
-  * 소멸된 객체의 레퍼런스 사용은 유효하지 않은 주소에 접근하게 되어 즉시 segmentation fault 발생
+    * **Undefined behavior** (dangling reference)
+  * 소멸된 객체에 대한 레퍼런스를 사용하는 것은 **유효하지 않은 주소로의 접근**을 의미
+    * 유효하지 않은 주소로의 접근 시 segmentation fault 오류 발생
 
 ```cpp
 int& f() {

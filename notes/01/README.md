@@ -42,14 +42,13 @@ int main() {
 * 개행 함수 (*function*)
 * 출력 버퍼에 담긴 데이터를 즉시 내보냄
   * 개행 문자를 출력 버퍼로 내보낸 뒤 출력 버퍼에 그동안 축적한 데이터를 표준 출력으로 내보냄
-  * `std::cout << std::endl;` 문장은 `std::cout << '\n' << std::flush;` 문장과 동일하게 동작함
 
 ---
 
 ## 이름 공간 (*Namespace*)
 
 * 사용하고자 하는 이름 (*name*)의 **소속**을 구분하기 위함
-* 프로그램 규모가 커짐에 따라 식별자 (*itentifier*) 중복으로 인한 컴파일 오류 급증
+* 프로그램 규모가 커짐에 따라 식별자 (*identifier*) 중복으로 인한 컴파일 오류 급증
 * 효율적으로 이름을 구분하여 사용하기 위해 이름 공간 개념 도입
   * `std::cout`: `std`라는 이름 공간에 속해 있는 `cout` 객체 사용
 
@@ -89,7 +88,8 @@ int func() {
 }  // header1
 ```
 
-* 범위지정연산자를 사용해 다른 이름 공간에 속한 이름 사용 가능 (e.g., 변수 사용, 함수 호출, etc.)
+* 범위지정연산자를 사용해 다른 이름 공간에 속한 이름 사용 가능
+  * e.g., 변수 사용, 함수 호출, etc.
 
 ```cpp
 #include "header1.hpp"
@@ -357,7 +357,7 @@ int main() {
 
 #### Including Standard C Library Headers in C++
 
-In C++, when including standard C library headers, we use the "c" and drop the ".h" extension.
+In C++, standard C library headers are prefixed with 'c' and omit the '.h' extension.
 
 ```cpp
 // <string.h>

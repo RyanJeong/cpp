@@ -28,7 +28,8 @@ math: mathjax
 
 * 실세계에 있는 객체를 최대한 유사하게 프로그래밍 세계에 표현하는 것
 * 추상화를 통해 객체의 속성 (*attribute*)과 행위 (*behavior*) 추출
-  * e.g., **내 반려견**의 속성은 **품종**, **나이**, **체중**, 행위는 **짖기**, **뛰기**, **먹기**
+  * **내 반려견**의 속성은 **품종**, **나이**, **체중**
+  * **내 반려견**의 행위는 **짖기**, **뛰기**, **먹기**
 
 ![center](Figure_A.png)
 
@@ -57,7 +58,7 @@ math: mathjax
   class Circle;
   ```
 
-  * 클래스를 정의하려면 헤더 뒤에 클래스의 데이터 멤버와 멤버 함수를 **선언**할 수 있는 블록을 사용해야 함
+  * 클래스 정의 시 클래스 헤더 뒤 본문 (*block*)에 데이터 멤버와 멤버 함수 작성
 
   ```cpp
   // Definition of the Circle class
@@ -135,9 +136,11 @@ void Circle::set_radius(double r) { radius_ = r; }
 
 ### 실습 - 인스턴스 사용
 
-* 객체가 사용할 수 있는 멤버는 `public` 접근 지시자가 사용된 두 함수 (`set_radius`, `get_radius`)
-  * 멤버 사용은 멤버 선택 연산자 `.` (*member selection operator*) 사용
-* 객체는 `private` 접근 지시자가 사용된 데이터 (`radius_`)에 바로 접근 불가
+* 객체가 사용할 수 있는 멤버는 `public` 접근 제한자가 사용된 식별자
+  * `set_radius`, `get_radius`
+* 멤버 사용은 멤버 선택 연산자 `.` (*member selection operator*) 사용
+  * e.g., `circle.get_radius()`
+* 객체는 `private` 접근 제한자가 사용된 식별자 (e.g., `radius_`)에 접근 불가
   * 멤버 함수를 통해 간접적으로 접근 및 수정 가능
   * 클래스의 멤버 함수는 해당 클래스의 이름영역 안에 속함 (access from the same class)
 
@@ -215,11 +218,11 @@ void Circle::set_radius(double r) { radius_ = r; }
   }
   ```
 
-* `inline` 함수는 반드시 인라인화되는 것은 아님
+* 인라인 함수는 **반드시 인라인화되는 것은 아님**
   * `inline` 키워드는 함수의 인라인화를 **제안**하는 용도
-  * 컴파일러는 코드의 복잡도, 최적화 수준, 인라인화로 인한 성능 향상 등 다양한 요소를 고려하여 인라인화 여부 결정
   * `inline` 키워드가 사용되었음에도 컴파일러가 인라인화를 수행하지 않을 수 있음
-  * 일반적으로 짧고 간단하면서 빈번하게 호출되는 함수는 컴파일러가 **암묵적으로** 인라인화 수행
+* 컴파일러는 코드 복잡도, 최적화, 성능 등을 고려해 함수의 인라인화를 결정
+* 컴파일러는 일반적으로 짧고 간결하며 빈번히 호출되는 함수를 **암묵적으로** 인라인화 수행
 
 ---
 
@@ -285,8 +288,9 @@ inline void Circle::set_radius(double r) { radius_ = r; }
 > Use a struct only for passive objects that carry data; everything else is a class.
 
 * 클래스 내 기본 접근 제한자는 `private`, 구조체 내 기본 접근 제한자는 `public`
-* **행위 없이** 데이터만을 표현하는 사용자 정의 형 (*passive*)을 생성할 때에는 구조체, 데이터와 행위 둘 다 표현하는 사용자 정의 형을 생성할 때에는 클래스 사용
-  * C++ 구조체는 멤버 함수를 선언 및 정의해 사용할 수 있으나, 사용하지 않음을 권장
+* **행위 없이** (*passive*) 데이터만을 표현하는 사용자 정의 형 생성 시 구조체 사용
+* 행위가 포함되면서 데이터를 같이 표현하는 사용자 정의 형 생성 시 클래스 사용
+  * **C++ 구조체는 멤버 함수를 선언 및 정의해 사용할 수 있으나, 사용하지 않음을 권장**
 
 ```cpp
 struct Person {
@@ -350,13 +354,15 @@ double GetRadius() { return 20.0; }
 
 ### [함수 오버로딩 해석 (*Function Overload Resolution*)](https://en.cppreference.com/w/cpp/language/overload_resolution)
 
-* 오버로딩된 함수 호출 시 매개변수 형태가 정확히 일치하지 않으면 컴파일러는 형 변환 (*implicit conversion*) 시도
+* 전달인자의 형태와 함수 매개변수의 형태가 일치하지 않으면, 아래 순서에 따라 매개변수 형태 변환
+  * 변환 과정 중 가장 적합한 함수를 찾아 호출하기 위함
+  * **변환 과정을 통해 후보 함수가 2개 이상 발견될 경우 모호성 문제가 발생하여 컴파일 오류 발생**
 
 #### [Ranking of Implicit Conversion Sequences](https://en.cppreference.com/w/cpp/language/overload_resolution#Ranking_of_implicit_conversion_sequences)
 
-  1. Exact match (no conversion required)
-  2. Promotion: integer promotion (e.g., `bool`, `char`, `short` → `int`), floating-point promotion (e.g., `float` → `double`)
-  3. Conversion: integral conversion, floating-point conversion, floating-integral conversion, ...
+1. Exact match (no conversion required)
+2. Promotion: integer promotion (e.g., `bool`, `char`, `short` → `int`), floating-point promotion (e.g., `float` → `double`)
+3. Conversion: integral conversion, floating-point conversion, floating-integral conversion, ...
 
 ```cpp
 #include <iostream>
@@ -642,9 +648,10 @@ int main() {
 ![center](Figure_7_10.png)
 
 * 멤버 함수는 하나의 메모리 공간에 위치 ([Code segment](https://en.wikipedia.org/wiki/Code_segment))
-* 여러 접근 지시자를 사용할 수 있음
-  * 생성된 객체는 오직 `public` 접근 지시자가 사용된 멤버 함수를 통해 데이터 멤버를 조회 및 조작할 수 있음 (OOP 원칙)
-    * 정의된 메서드만을 통해 데이터 멤버를 조회 및 조작함으로써 데이터 멤버로의 잘못된 접근 및 연산 억제 목적
+* 여러 접근 제한자를 사용할 수 있음
+  * 객체는 오직 `public` 멤버 함수를 사용해 데이터 멤버를 조회 및 조작해야 함
+    * [OOP 원칙 중 하나 (Principles of Object-Oriented Programming)](https://en.wikipedia.org/wiki/Object-oriented_programming)
+  * 정의된 메서드만을 사용하여 `private` 데이터 멤버로의 잘못된 접근 및 연산 억제 목적
 
 ---
 
@@ -699,15 +706,16 @@ circle1.get_radius(this);
 
 #### `this` 포인터 활용
 
+* 멤버 함수의 매개변수 이름과 데이터 멤버의 이름이 서로 비슷한 경우
+
 ```cpp
 // Without using this pointer
 void Circle::set_radius(double radius) { radius_ = radius; }
 ```
 
-* 멤버 함수의 매개변수 이름과 데이터 멤버의 이름이 서로 비슷할 경우, `this` 포인터를 사용해 가독성을 높일 수 있음:
+* `this` 포인터를 사용해 매개변수 이름과 데이터 멤버의 이름을 구분할 수 있음
 
 ```cpp
-// Without using this pointer
 void Circle::set_radius(double radius) { this->radius_ = radius; }
 ```
 
@@ -763,33 +771,50 @@ g++ -o application *.cpp
 
 ### 헤더 가드
 
+#### C 언어 헤더 가드
+
+```cpp
+#ifndef HEADER_GUARD_SYMBOL
+#define HEADER_GUARD_SYMBOL
+
+// contents of this header file
+
+#endif
+```
+
 * 헤더 파일의 내용이 컴파일 시 여러 번 포함되는 것을 방지하는 기법
 * 헤더 가드 심볼은 일반적으로 해당 파일의 경로와 해당 파일의 이름 조합으로 작성
-  * 만약 `/foo/bar` 경로에 위치한 `qux.h`라면, `qux.h` 파일의 헤더 가드 심볼은 `#define __FOO_BAR_QUX_H__`
+  * 만약 `/foo/bar` 경로에 위치한 `qux.h` 파일의 헤더 가드 심볼은 `__FOO_BAR_QUX_H__`
 
-![center](Figure_7_16.png)
+#### C++ 헤더 가드 ([`#pragma once`](https://en.wikipedia.org/wiki/Pragma_once))
 
-* C++에는 **비표준**이지만 보다 편리한 방법으로 헤더 가드를 구현할 수 있음
-  * [`#pragma once`](https://en.wikipedia.org/wiki/Pragma_once)
-  * 비표준이므로, 몇몇 환경에서는 이를 지원하지 않을 수 있으나, 대부분의 C++ (`-std=c++11` 이후) 컴파일러는 이를 지원함
+```cpp
+#pragma once
+
+// contents of this header file
+```
+
+* **비표준**이므로 몇몇 환경에서는 이를 지원하지 않을 수 있음
+* 모던 C++(`-std=c++11` 이후)를 빌드할 수 있는 컴파일러는 이를 **대부분** 지원함
 
 ---
 
-### 분할 컴파일 활용 예시 - SDK 배포
+### 분할 컴파일 활용 예시 - SDK (Software Development Kit) 배포
 
-* SDK (Software Development Kit) 배포 시 주로 인터페이스는 헤더 파일로, 구현물은 목적 파일 혹은 라이브러리 형태로 배포
+* SDK 배포 시 주로 인터페이스는 헤더 파일로, 구현물은 라이브러리 형태로 배포
+  * 라이브러리 (*libraries*)는 여러 개의 목적 파일 (`.o`)을 하나로 묶어놓은 파일
 
-  * 다음과 같은 시나리오가 있다고 가정:
-    1. `Foo` 클래스를 개발한 회사 `A`와 이를 필요로 하는 회사 `B`가 있다.
-    2. `Foo` 클래스의 일부 멤버 함수는 회사 `A`만의 독자적인 알고리즘을 기반으로 구현되어 있으며, 회사 `A`는 이를 외부에 노출하고 싶지 않다.
-    3. `Foo` 클래스를 정의한 헤더 파일과 `Foo` 클래스의 멤버 함수를 정의한 소스코드 파일을 그대로 전달할 경우 모든 내용이 공개될 것이다.
+다음과 같은 시나리오가 있다.
 
-  * 해결 방안:
-    1. 클래스 정의는 헤더파일에, 클래스 멤버 함수 정의는 소스코드 파일에 저장한다.
-    2. 컴파일러를 사용해 소스코드 파일을 목적파일 (`.o`) 혹은 라이브러리 (`.a` 또는 `.so`) 형태로 변환 후 전달한다.
-    3. **컴파일 과정은 단방향**이며, 컴파일러를 사용해 변환된 결과물은 원본드로 다시 되돌릴 수 없다.
-    4. 따라서, 회사 `A`는 자사 기술을 보호할 수 있으면서 회사 `B`는 회사 `A`의 `Foo` 클래스를 사용할 수 있다.
-  * 회사 `B`는 `Foo` 클래스의 자세한 내용은 알 수 없지만, 적어도 `Foo` 클래스를 사용할 수 있는 상태가 됨
+1. `Foo` 클래스를 개발한 회사 `A`와 이를 필요로 하는 회사 `B`가 있다.
+2. `Foo` 클래스의 일부 멤버 함수는 회사 `A`만의 독자적인 알고리즘을 기반으로 구현되어 있으며, 회사 `A`는 이를 외부에 노출하고 싶지 않다.
+3. `Foo` 클래스를 정의한 헤더 파일과 `Foo` 클래스의 멤버 함수를 정의한 소스코드 파일을 그대로 전달할 경우 모든 내용이 공개될 것이다.
+
+해결 방안:
+
+1. 클래스 정의는 헤더파일에, 클래스 멤버 함수 정의는 소스코드 파일에 저장한다.
+2. 컴파일러를 사용해 소스코드 파일을 라이브러리 (`.a` 또는 `.so`) 형태로 변환 후 전달한다 (컴파일 과정은 **단방향**이며, **컴파일러를 사용해 변환된 결과물은 원본 형태로 다시 되돌릴 수 없다**).
+3. 따라서 회사 `A`는 자사 기술을 보호할 수 있음과 동시에 회사 `B`는 회사 `A`의 `Foo` 클래스 사용이 가능하다.
 
 ---
 
@@ -883,9 +908,13 @@ int main() {
 
 ![center](Figure_7_13.png)
 
-* 클래스는 인스턴스 멤버 (*instance territory*)와 정적 멤버 (*static territory*)를 가질 수 있음
-  * 인스턴스 멤버: 데이터 멤버, 멤버 함수
-  * 정적 멤버: 정적 데이터 멤버, 정적 멤버 함수
+* 인스턴스 멤버는 인스턴스 영역 (*instance territory*)에 속함
+  * 데이터 멤버
+  * 멤버 함수
+* 정적 멤버는 정적 영역 (*static territory*)에 속함
+  * 정적 데이터 멤버
+  * 정적 멤버 함수
+* **클래스는 인스턴스 멤버와 정적 멤버를 가질 수 있음**
 
 ---
 
@@ -953,8 +982,9 @@ int count = rect.get_count();
   * 정적 멤버 함수는 인스턴스 데이터 멤버 접근 불가
   * 인스턴스 멤버 함수는 정적 데이터 멤버로 접근 가능
     * 정적 데이터 멤버는 프로그램 실행 시 메모리에 할당됨
-    * 인스턴스가 생성되어 사용할 시점에는 정적 데이터 멤버는 항상 준비되어 있음
-* 인스턴스 데이터 멤버 접근 시 인스턴스 멤버 함수를 사용하고, 정적 데이터 멤버 접근 시 정적 멤버 함수를 사용 권장
+    * **인스턴스를 사용할 시점에는 정적 데이터 멤버는 항상 준비되어 있음**
+* 인스턴스 데이터 멤버 접근 시 인스턴스 멤버 함수 사용 권장
+* 정적 데이터 멤버 접근 시 정적 멤버 함수 사용 권장
 
 ---
 
