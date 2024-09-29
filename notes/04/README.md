@@ -29,7 +29,7 @@ int& r_score = score;  // Declaring r_score and binding it to score
 
 ---
 
-* 레퍼런스 대상은 상수 관계 (*constant relation*)
+* 레퍼런스 대상은 상수 관계 (constant relation)
 
 ![center](Figure_9_2.png)
 
@@ -43,7 +43,7 @@ r_score = num;  // now, score is 80
 ---
 
 * 한 객체에 여러 개의 레퍼런스 지정 가능
-  * 참조 다중성 (*multiplicity*)
+  * 참조 다중성 (multiplicity)
 
 ![center](Figure_9_3.png)
 
@@ -54,7 +54,7 @@ r_score = num;  // now, score is 80
 
 ---
 
-* 레퍼런스는 *l-value* 레퍼런스
+* 일반 레퍼런스는 *l-value* 레퍼런스
   * *r-value* 레퍼런스 불가
 
 ```cpp
@@ -126,7 +126,7 @@ name = 20;
 * 전달인자를 함수 쪽으로 전달할 때 효율적으로 전달 가능
 * 상황에 따른 매개변수:
   1. 매개변수가 함수 내에서 읽기 전용인 경우 `const T&` 형태 (e.g., 복사 생성자)를 사용한다. 만약 매개변수의 자료형이 기본 자료형이라면 *pass-by-value* 형태도 사용 가능하다.
-  2. 매개변수가 함수 내에서 *side-effect*가 발생하는 경우 `T*` 형태를 사용한다.
+  2. 매개변수가 함수 내에서 변경되는 경우 `T*` 형태를 사용한다.
   3. **되도록 `const` 한정자 없는 레퍼런스는 사용하지 않는 것을 권장한다.**
 
 ---
@@ -154,7 +154,7 @@ int main() {
 
 * 메모리 주소를 표현하는 복합 자료형
 
-### 메모리의 주소 (*Addresses in Memory*)
+### 메모리의 주소 (Addresses in Memory)
 
 ![center](Figure_9_7.png)
 
@@ -166,11 +166,12 @@ int main() {
 
 ---
 
-### 객체의 주소 (*Address of a Variable*)
+### 객체의 주소 (Address of a Variable)
 
 * 프로그램에서 실체화되는 각 객체들은 자료형에 따라 필요한 만큼의 바이트를 차지
   * `char` 형 객체는 1 바이트, `int` 형 객체는 일반적으로 4 바이트
-* 실체화된 객체가 *n* 바이트를 차지할 경우, *n* 바이트의 첫 바이트 (가장 낮은 메모리 주소)를 객체의 주소로 사용
+* *n* 바이트 객체는 *n* 개의 바이트 중 첫 바이트의 주소를 객체의 주소로 사용
+  * *n* 개의 바이트 중 가장 낮은 메모리 주소
 
 ![center](Figure_9_8.png)
 
@@ -199,11 +200,11 @@ double* p_num = &num;  // Error, Variable p_num is of type double*
 
 ### 포인터 단항 연산자
 
-* `&` (address-of)
+* 주소 연산자 (`&`, address-of)
   * 객체의 주소 반환
   * 결합 방향은 오른쪽에서 왼쪽 (←)
 
-* `*` (indirection)
+* 역참조 연산자 (`*`, indirection)
   * 포인터 변수가 가리키는 주소로 객체 참조
   * 결합 방향은 오른쪽에서 왼쪽 (←)
 
@@ -353,7 +354,7 @@ p = &y;  // Make p to point to a double type
 * *Pass-by-value*와 동작은 동일하나, 매개변수는 객체의 주소값을 복사
 * 상황에 따른 매개변수:
   1. 매개변수가 함수 내에서 읽기 전용인 경우 `const T&` 형태 (e.g., 복사 생성자)를 사용한다. 만약 매개변수의 자료형이 기본 자료형이라면 *pass-by-value* 형태도 사용 가능하다.
-  2. 매개변수가 함수 내에서 *side-effect*가 발생하는 경우 `T*` 형태를 사용한다.
+  2. 매개변수가 함수 내에서 변경되는 경우 `T*` 형태를 사용한다.
   3. **되도록 `const` 한정자 없는 레퍼런스는 사용하지 않는 것을 권장한다.**
 
 ---
@@ -458,7 +459,7 @@ int main() {
 
 ## 함수의 배열 반환
 
-* 실제로 메모리 수준의 배열을 복사 반환하는 것이 아닌, 이미 생성된 배열 객체의 시작 주소를 반환하는 것
+* 실제로 메모리 수준의 배열을 복사 반환하는 것이 아닌, 이미 생성된 배열 객체의 시작 주소 반환
 * **Dangling pointer**가 발생하지 않도록 유의할 것
 
 ```cpp
@@ -491,7 +492,7 @@ int main() {
 
 ---
 
-## 메모리 관리 (*Memory Management*)
+## 메모리 관리 (Memory Management)
 
 * C++ 런타임은 프로그램 실행 시 메모리를 다섯 영역으로 구분하여 관리
 
@@ -573,7 +574,7 @@ int main() {
 |Delete Array   |`delete[]`|`delete[] ptr`|
 ---
 
-* `new` (*allocate object*)
+* `new` 연산자 (*allocate object*)
   * 힙 영역에 객체 생성 시 사용하는 연산자
   * 생성하려는 객체가 클래스 형 객체라면, 생성자가 호출됨
   * 만약 벡터 객체를 할당해야 한다면 `new[]` (*allocate array*) 연산자 사용
@@ -590,7 +591,7 @@ int main() {
 
 ---
 
-* `delete` (*delete object*)
+* `delete` 연산자 (*delete object*)
   * 힙 영역에 생성된 객체 소멸 시 사용하는 연산자
     * 아래의 경우들을 유의할 것:
       * 다른 영역 객체를 소멸하면 undefined behavior
@@ -767,8 +768,8 @@ int main() {
   * 각 행마다 서로 다른 길이의 1차원 배열을 가리키는 경우
 
 * 파스칼 삼각형 (*Pascal's triangle*)
-  * 래기드 배열의 한 형태
-  * *x + y* 형태의 이항식 (binomial)을 *n* 제곱하여 전개하였을 때의 계수 (coefficients)를 표현한 것
+  * 래기드 배열의 한 형태:
+  * *x + y* 형태의 이항식을 *n* 제곱하여 전개하였을 때의 계수 (coefficients)를 표현한 것
 
 ![center h:450](Figure_A_Pascal_Triangle.png)
 
