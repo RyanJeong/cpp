@@ -183,7 +183,7 @@ int main() {
 
 > A public member in the base class becomes a public member in the derived class.
 
-![center](Figuer_11_8.png)
+![center](Figure_11_8.png)
 
 * 파생 클래스 객체는 기반 클래스의 `public` 메서드들을 사용할 수 있음
   * 파생 클래스 객체가 파생 클래스의 `public` 메서드를 호출하면 파생 클래스 범위가 됨
