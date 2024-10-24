@@ -293,9 +293,9 @@ int main() {
 ```
 
 * 일반 상속 관계라면 기반 클래스는 `A`
-* 다형성에서의 기반 클래스는 `B`
-  * **가상 함수를 선언한 클래스**
-  * 다형성을 사용하기 위해서는 `B*` 포인터를 사용해야 함
+* **다형성에서의 기반 클래스는 `B`**
+  * 가상 함수를 선언한 클래스
+  * 다형성을 사용하기 위해서는 `B` 형 포인터를 사용해야 함
 
 ---
 
@@ -617,10 +617,8 @@ int main() {
 * 컴파일 시점에 함수 호출과 함수 정의 간 연관을 확정
   * 컴파일 시점 바인딩 (compile-time binding)
   * 조기 바인딩 (early binding)
-* 함수 호출 대상이 일반 함수인 경우
+* 함수 호출 대상이 일반 함수 (클래스의 멤버 함수나 전역 함수)인 경우
   * 컴파일 시점에 어떤 함수가 호출될지 명확하게 결정됨
-  * 비멤버 함수는 함수 호출 시점의 전달인자 형태와 함수 이름에 따라 결정됨
-  * 멤버 함수는 포인터 형, 참조 형, 또는 호스트 객체 형에 따라 결정됨
 
 ```cpp
 Person person;
@@ -637,14 +635,11 @@ student.print();  // Student::print()
 * 런타임 시점에 함수 호출과 함수 정의 간 연관을 확정
   * 런타임 시점 바인딩 (run-time binding)
   * 지연 바인딩 (late binding)
-* 동적 바인딩을 위한 조건
-  * 가상 함수가 호출되어야 함
-    * 기반 클래스의 가상 함수를 파생 클래스에서 재정의해야 함
-  * 기반 클래스 형 포인터 또는 참조를 사용해야 함
-    * 만약 일반 호스트 객체를 사용해 가상 함수를 호출하는 경우는 **정적 바인딩**
-* 동적 바인딩은 런타임 시점에 객체의 형이 확정되는 여러 상황에 대비하여 올바른 함수 호출 보장
+* 아래와 같은 경우는 컴파일 시점에 호출될 함수를 결정할 수 없음
 
 ```cpp
+int user_input;
+std::cin >> user_input;
 Base* ptr;
 if (user_input == 1)
   ptr = new Base();
@@ -654,3 +649,117 @@ ptr->func();  // In this case, we don't know which `func` will be invoked on
               // compile-time
 ```
 
+* 컴파일 시점에 호출될 함수를 연관하지 못하는 경우는 동적 바인딩
+* C++의 가상함수는 동적 바인딩 상황에서 올바른 함수를 호출할 수 있도록 **지원**
+  * 가상 함수를 사용한 동적 바인딩은 런타임 시점의 객체 형에 따라 호출할 함수 결정
+  * 가상 함수를 사용한 동적 바인딩은 다형성 (run-time polymorphism)
+
+---
+
+## Appendix A. `vptr`의 유무에 따른 객체 크기 비교
+
+```cpp
+#include <iostream>
+
+class NoVirtual {
+ public:
+  int a;
+  double b;
+};
+
+class WithVirtual {
+ public:
+  int a;
+  double b;
+  virtual void func() {}  // declare a virtual function using a virtual keyword
+};
+
+int main() {
+  NoVirtual no_virtual_obj;
+  WithVirtual with_virtual_obj;
+
+  std::cout << "Size of NoVirtual object: " << sizeof(no_virtual_obj)
+            << " bytes" << std::endl;
+  std::cout << "Size of WithVirtual object: " << sizeof(with_virtual_obj)
+            << " bytes" << std::endl;
+
+  return 0;
+}
+```
+
+---
+
+## Appendix B. 가상 테이블의 포인터와 실제 멤버 함수 포인터 간 비교
+
+* test.hpp
+```cpp
+#pragma once
+
+#include <iostream>
+
+class Base {
+ public:
+  virtual void Show() { std::cout << "Base::Show called" << std::endl; }
+  virtual void Display() { std::cout << "Base::Display called" << std::endl; }
+};
+
+class Derived : public Base {
+ public:
+  void Show() override { std::cout << "Derived::Show called" << std::endl; }
+  virtual void Print() { std::cout << "Derived::Print called" << std::endl; }
+};
+
+// Helper function to get the virtual function pointer from vtable
+typedef void (*FuncPtr)();  // Function pointer type definition
+
+FuncPtr GetVirtualFunctionPointer(Base* obj, int index) {
+  // Retrieves vptr from the object and returns the function pointer
+  // from the vtable at the specified index
+  return reinterpret_cast<FuncPtr*>(*reinterpret_cast<void**>(obj))[index];
+}
+```
+
+---
+
+* main.cc
+
+```cpp
+#include <iostream>
+
+#include "test.hpp"
+
+int main() {
+  // Get the function pointers from the vtable for the Base class using index
+  Base base_obj;
+  FuncPtr base_vtable_show = GetVirtualFunctionPointer(&base_obj, 0);
+  FuncPtr base_vtable_display = GetVirtualFunctionPointer(&base_obj, 1);
+
+  // Get the function pointers from the vtable for the Derived class using index
+  Derived derived_obj;
+  FuncPtr derived_vtable_show = GetVirtualFunctionPointer(&derived_obj, 0);
+  FuncPtr derived_vtable_display = GetVirtualFunctionPointer(&derived_obj, 1);
+  FuncPtr derived_vtable_print = GetVirtualFunctionPointer(&derived_obj, 2);
+
+  // Compare the pointers for the Base class
+  std::cout << "Base class vtable function pointers:" << std::endl;
+  std::cout << "Show function pointer from vtable(" << (void*) base_vtable_show
+            << "):";
+  base_vtable_show();
+  std::cout << "Display function pointer from vtable("
+            << (void*) base_vtable_display << "):";
+  base_vtable_display();
+
+  // Compare the pointers for the Derived class
+  std::cout << "\nDerived class vtable function pointers:" << std::endl;
+  std::cout << "Show function pointer from vtable("
+            << (void*) derived_vtable_show << "):";
+  derived_vtable_show();
+  std::cout << "Display function pointer from vtable("
+            << (void*) derived_vtable_display << "):";
+  derived_vtable_display();
+  std::cout << "Print function pointer from vtable("
+            << (void*) derived_vtable_print << "):";
+  derived_vtable_print();
+  return 0;
+}
+```
