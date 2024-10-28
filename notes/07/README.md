@@ -374,7 +374,7 @@ int main() {
   * **가상 포인터는 객체가 실체화되는 시점에 객체 내에 할당**
     * 가상 생성자는 가상 테이블을 참조할 수 없는 상태
 
-* **소멸가는 가상화 가능**
+* **소멸자는 가상화 가능**
   * 소멸자도 클래스마다 이름이 다르지만, 객체의 소멸 시점에 런타임이 자동으로 호출
   * 객체 소멸 시점에는 가상 포인터도 객체 내에 설정되어 있음
   * **클래스 설계 시 가상 함수를 사용할 경우 반드시 가상 소멸자를 사용해야 함**
@@ -656,6 +656,656 @@ ptr->func();  // In this case, we don't know which `func` will be invoked on
 
 ---
 
+## 런타임 형 정보 (RTTI, Run-Time Type Information)
+
+* 런타임 시점에 사용 중인 객체의 형을 확인해야 할 경우가 있음
+* `<typeinfo>` 헤더를 사용하면 런타임 시점에 형과 관련한 유용한 정보를 얻을 수 있음
+  * `type_info` 클래스가 정의되어 있음
+  * `typeid` 연산자에 표현식을 전달해 `type_info` 형 객체를 만들 수 있음
+    * `typeid(5)`, `typeid(5 + 3)`, `typeid(object_name)`
+* `type_info` 형 객체에 지원되는 연산들
+
+```text
+t1 == t2      // Returns true if t1 and t2 are of the same type
+t1 != t2      // Returns true if t1 and t2 are of different types
+t1.name()     // Returns a C-type string (name of the t1)
+t1.before(t2) // Returns true if t1 comes before t2
+```
+
+---
+
+### 런타임 형 정보 예시
+
+```cpp
+#include <iostream>
+#include <typeinfo>
+
+class Animal {};
+class Horse : public Animal {};
+
+int main() {
+  Animal animal;
+  Horse horse;
+
+  // Check if 'animal' and 'horse' are of the same type or not
+  std::cout << "'animal' and 'horse' are of the same type: ";
+  std::cout << std::boolalpha << (typeid(animal) == typeid(horse)) << std::endl;
+  std::cout << "'animal' and 'horse' are of different types: ";
+  std::cout << std::boolalpha << (typeid(animal) != typeid(horse)) << std::endl;
+
+  // Get the type's name of instances
+  std::cout << "Type name of animal: ";
+  std::cout << typeid(animal).name() << std::endl;
+  std::cout << "Type name of horse: ";
+  std::cout << typeid(horse).name() << std::endl;
+  return 0;
+}
+```
+
+## 형 변환 (Type Casting)
+
+* C++에서의 형 변환 방법은 4가지 (강한 타입 변환 규칙, explicit casting rules):
+  1. `static_cast`
+  2. `reinterpret_cast`
+  3. `const_cast`
+  4. `dynamic_cast`
+* C++ 형 변환이 C 언어 형 변환보다 **안정적**
+  * C++은 정적 타입 검사 (static type checking)를 수행 (type safety 언어)
+    * C 언어에서 가능한 변환이 C++에서는 안될 수 있음
+  * C++ 형 변환 사용 권장
+
+### `static_cast`
+
+* 컴파일 시점에 수행되는 형 변환
+* **암묵적 변환**이 가능한 범위 내에서 형 변환이 가능한 경우 사용
+  * **암묵적 변환**이 안 되는 상황에서 `static_cast` 사용 시 컴파일 오류
+* **객체의 값이 변경됨** (메모리에 있는 객체의 비트 패턴이 수정됨)
+
+```cpp
+float f = 3.14;
+int implicit_i = f;                    // OK, but it might be WARNING
+int explicit_i = static_cast<int>(f);  // OK, and there's no warning!
+
+int arr[] = {1, 2, 3};
+float* c_cast_ptr = (float*) arr;                // OK, It's C-style casting
+float* cpp_cast_ptr = static_cast<float*>(arr);  // Error, from 'int *' to
+                                                 // 'float *' is not allowed
+```
+
+---
+
+### `reinterpret_cast`
+
+* 컴파일 시점에 수행되는 형 변환
+* **객체의 값을 변경하지 않고** 해당 객체의 평가 방법만 변경
+  * 주로 제네릭 포인터 (`void*`)의 평가 방법을 지정할 때 활용
+  * 인접한 메모리 영역을 침범할 수 있음에 유의
+
+```cpp
+#include <iostream>
+
+int main() {
+  int i = 42, j = 100;
+  std::cout
+      << "Before, i(" << &i << "): " << i << ", j(" << &j << "): " << j
+      << std::endl;  // Before, i(0x7ffda6a702f8): 42, j(0x7ffda6a702f4): 100
+
+  // 0x7ffda6a702f4        0x7ffda6a702f8
+  // [<--- j(4 bytes) --->][<--- i (4 bytes) --->]
+  // ^
+  // d_ptr (will use 8 bytes - j's area + i's area)
+  double* d_ptr = reinterpret_cast<double*>(&j);
+  *d_ptr = 123.456;
+  std::cout << "After, i: " << i << ", j: " << j
+            << std::endl;  // After, i: 1079958831, j: 446676599
+  return 0;
+}
+```
+
+---
+
+### `const_cast`
+
+* 컴파일 시점에 수행되는 형 변환
+* 객체의 상수성 (`const`, constness) 또는 휘발성 (`volatile`, volatility) 제거 가능
+* 주로 함수에서 일반 객체를 상수성 혹은 휘발성 매개변수로 받아 처리할 때 사용됨
+* **아래의 경우들은 정의되지 않은 동작 (UB)**
+  * 원본 객체가 상수성을 갖고 있을 때, `const_cast`를 사용해 상수성을 제거할 경우
+  * 원본 객체가 휘발성을 갖고 있을 때, `const_cast`를 사용해 휘발성을 제거할 경우
+
+```cpp
+#include <iostream>
+
+void foo(const int& x) {
+  // We can't modify the x directly like this: x = 100;
+  // It's the only way to modify the parameter 'x'
+  int& ref_x = const_cast<int&>(x);  // Safely remove constness using const_cast
+  ref_x = 100;  // Modify the value of x through ref_x, x is now 100
+}
+
+int main() {
+  int i = 0;  // 'i' is a normal object
+
+  const int& ref_i = i;
+  const_cast<int&>(ref_i) += 4;  // now the value of 'i' is 4
+  const int* ptr_i = &i;
+  *const_cast<int*>(ptr_i) += 5;  // now the value of 'i' is 9
+  std::cout << "The value of i: " << i << std::endl;
+
+  const int j = 0;  // 'j' is a read-only object (constness)
+
+  const int& ref_j = j;
+  const_cast<int&>(ref_j) += 6;  // UB, we can't sure the value of 'j'
+  const int* ptr_j = &j;
+  *const_cast<int*>(ptr_j) = 7;  // UB, we can't sure the value of 'j'
+
+  int x = 10;
+  foo(x);
+  std::cout << "The value of x: " << x << std::endl;
+  return 0;
+}
+```
+
+---
+
+### `dynamic_cast`
+
+* 런타임 시점에 다운 캐스팅을 명시적으로 수행할 때 사용
+
+#### 다운 캐스팅 (Downcasting)
+
+* 기반 클래스 형 포인터 또는 참조를 파생 클래스 형 포인터 또는 참조로 변환하는 작업
+  * 기반 클래스 범위를 파생 클래스 범위로 확장해 파생 클래스 고유의 멤버에 접근 가능해짐
+* 런타임 시점에 이루어지는 작업
+* 주로 다형성을 사용하는 상황에서 특정 파생 클래스에 속하는 객체인지 확인할 때 사용
+* 실패할 가능성이 있으므로 **명시적 형 변환**만을 허용
+
+#### 업 캐스팅 (Upcasting)
+
+* 파생 클래스 형 포인터 또는 참조를 기반 클래스 형 포인터 또는 참조로 변환하는 작업
+* 컴파일 시점에 이루어지는 작업
+* 주로 기반 클래스의 공통된 인터페이스 (e.g., 가상 함수)를 활용하는 다형성 구현에 사용
+* 실패할 가능성이 없으므로 **암묵적 형 변환** 사용
+  * 모든 파생 클래스는 기반 클래스의 내용을 담고 있음
+
+---
+
+```cpp
+#include <iostream>
+
+class Base {
+ public:
+  virtual ~Base() = default;  // Virtual destructor for RTTI support (vtable)
+};
+
+class Derived : public Base {};
+class AnotherDerived : public Base {};
+
+int main() {
+  // Upcasting (Derived -> Base): Implicit upcasting, safe without explicit cast
+  Derived derived_obj;
+  Base* base_ptr = &derived_obj;
+  std::cout << "Upcasting successful." << std::endl;
+
+  // Successful downcasting (Base -> Derived)
+  Derived* derived_ptr = dynamic_cast<Derived*>(base_ptr);
+  std::cout << "Downcasting to Derived "
+            << (derived_ptr ? "successful." : "failed.") << std::endl;
+
+  // Failed downcasting (Base -> Derived)
+  AnotherDerived another_obj;
+  base_ptr = &another_obj;  // Base pointer now points to AnotherDerived object
+  derived_ptr = dynamic_cast<Derived*>(base_ptr);  // Incorrect downcasting
+  std::cout << "Downcasting to Derived "
+            << (derived_ptr ? "successful." : "failed.") << std::endl;
+
+  return 0;
+}
+```
+
+---
+
+## 추상 클래스 (Abstract Classes)
+
+* 하나 이상의 순수 가상 함수를 포함하는 클래스
+* 추상 클래스는 이를 상속 받는 모든 클래스에게 **특정 멤버 함수의 구현을 강제할 수 있음**
+
+### 순수 가상 함수 (Pure Virtual Functions)
+
+* 구현이 없는 가상 함수
+* 순수 가상 함수는 파생 클래스에서 구현을 완료해야 하는 함수
+  * 순수 가상 함수를 가진 클래스 형 객체는 **실체화할 수 없음**
+  * 파생 클래스 내 상속 받은 순수 가상 함수가 존재할 경우 이를 반드시 구현해야 함
+    * 구현하지 않는다면 컴파일 시 오류
+* 가상 함수 선언 뒤에 0을 할당 (`= 0`)하면 이는 순수 가상 함수가 됨
+
+```cpp
+virtual double get_area(0) = 0;
+virtual double get_perimeter(0) = 0;
+```
+
+---
+
+## 인터페이스 (Interfaces)
+
+* 클래스의 모든 멤버 함수가 순수 가상 함수인 경우
+* 상속 받을 클래스에게 청사진 (blue print)를 제공하기 위한 용도
+  * 인터페이스의 역할은 이를 상속 받는 클래스가 반드시 구현해야 할 메서드를 안내하기 위한 용도
+
+![center](Figure_12_7.png)
+
+* 인터페이스 상속은 클래스 다이어그램에서 점선을 사용하며, 클래스 기호 내 `<<interface>>` 표시
+
+![center](Figure_12_Interface.png)
+
+---
+
+### 인터페이스 예시
+
+* shape.hpp
+
+```cpp
+#pragma once
+
+class Shape {
+  virtual bool is_valid() const = 0;
+
+ public:
+  virtual void print() const = 0;
+  virtual double get_area() const = 0;
+  virtual double get_perimeter() const = 0;
+};
+```
+
+---
+
+* circle.hpp
+
+```cpp
+#pragma once
+
+#include "shape.hpp"
+
+class Circle : public Shape {
+  bool is_valid() const override;
+
+  double radius_;
+
+ public:
+  explicit Circle(double radius);
+  ~Circle() = default;
+
+  void print() const override;
+  double get_area() const override;
+  double get_perimeter() const override;
+};
+```
+
+---
+
+* circle.cc
+
+```cpp
+#include "circle.hpp"
+
+#include <cassert>
+#include <iostream>
+
+Circle::Circle(double r) : radius_(r) {
+  if (!is_valid()) {
+    std::cout << "Invalid circle!";
+    assert(false);
+  }
+}
+
+void Circle::print() const {
+  std::cout << "Circle of radius : " << radius_ << std::endl;
+}
+
+double Circle::get_area() const { return 3.14 * radius_ * radius_; }
+
+double Circle::get_perimeter() const { return 2 * 3.14 * radius_; }
+
+bool Circle::is_valid() const { return radius_ > 0.0; }
+```
+
+---
+
+* ellipse.hpp
+
+```cpp
+#pragma once
+
+#include "shape.hpp"
+
+class Ellipse : public Shape {
+  bool is_valid() const override;
+
+  double radius1_;
+  double radius2_;
+
+ public:
+  Ellipse(double r1, double r2);
+  ~Ellipse() = default;
+
+  void print() const override;
+  double get_area() const override;
+  double get_perimeter() const override;
+};
+```
+
+---
+
+* ellipse.cc
+
+```cpp
+#include "ellipse.hpp"
+
+#include <cassert>
+#include <cmath>
+#include <iostream>
+
+Ellipse::Ellipse(double r1, double r2) : radius1_(r1), radius2_(r2) {
+  if (!is_valid()) {
+    std::cout << "Invalid ellipse!";
+    assert(false);
+  }
+}
+
+void Ellipse::print() const {
+  std::cout << "Ellipse of radii : " << radius1_ << " X " << radius2_
+            << std::endl;
+}
+
+double Ellipse::get_area() const { return 3.14 * radius1_ * radius2_; }
+
+double Ellipse::get_perimeter() const {
+  double temp = (radius1_ * radius1_ + radius2_ * radius2_) / 2.0;
+  return 2 * 3.14 * std::sqrt(temp);
+}
+
+bool Ellipse::is_valid() const { return radius1_ > 0.0 && radius2_ > 0.0; }
+```
+
+---
+
+* rectangle.hpp
+
+```cpp
+#pragma once
+
+#include "shape.hpp"
+
+class Rectangle : public Shape {
+  bool is_valid() const override;
+
+  double length_;
+  double width_;
+
+ public:
+  Rectangle(double length, double width);
+  ~Rectangle() = default;
+
+  void print() const override;
+  double get_area() const override;
+  double get_perimeter() const override;
+};
+```
+
+---
+
+* rectangle.cc
+
+```cpp
+#include "rectangle.hpp"
+
+#include <cassert>
+#include <iostream>
+
+Rectangle::Rectangle(double length, double width)
+    : length_(length), width_(width) {
+  if (!is_valid()) {
+    std::cout << "Invalid rectangle!";
+    assert(false);
+  }
+}
+
+void Rectangle::print() const {
+  std::cout << "Rectangle of " << length_ << " X " << width_ << std::endl;
+}
+
+double Rectangle::get_area() const { return length_ * width_; }
+
+double Rectangle::get_perimeter() const { return 2 * (length_ + width_); }
+
+bool Rectangle::is_valid() const { return length_ > 0.0 && width_ > 0.0; }
+```
+
+---
+
+* square.hpp
+
+```cpp
+#pragma once
+
+#include "shape.hpp"
+
+class Square : public Shape {
+  bool is_valid() const override;
+
+  double side_;
+
+ public:
+  explicit Square(double side);
+  ~Square() = default;
+
+  void print() const override;
+  double get_area() const override;
+  double get_perimeter() const override;
+};
+```
+
+---
+
+* square.cc
+
+```cpp
+#include "square.hpp"
+
+#include <cassert>
+#include <iostream>
+
+Square::Square(double s) : side_(s) {
+  if (!is_valid()) {
+    std::cout << "Invalid square!";
+    assert(false);
+  }
+}
+
+void Square::print() const {
+  std::cout << "Square of size " << side_ << std::endl;
+}
+
+double Square::get_area() const { return side_ * side_; }
+
+double Square::get_perimeter() const { return 4 * side_; }
+
+bool Square::is_valid() const { return side_ > 0.0; }
+```
+
+---
+
+* triangle.hpp
+
+```cpp
+#pragma once
+
+#include "shape.hpp"
+
+class Triangle : public Shape {
+  bool is_valid() const override;
+
+  double side1_;
+  double side2_;
+  double side3_;
+
+ public:
+  Triangle(double side1, double side2, double side3);
+  ~Triangle() = default;
+
+  void print() const override;
+  double get_area() const override;
+  double get_perimeter() const override;
+};
+```
+
+---
+
+* triangle.cc
+
+```cpp
+#include "triangle.hpp"
+
+#include <cassert>
+#include <cmath>
+#include <iostream>
+
+Triangle::Triangle(double s1, double s2, double s3)
+    : side1_(s1), side2_(s2), side3_(s3) {
+  if (!is_valid()) {
+    std::cout << "Invalid triangle!";
+    assert(false);
+  }
+}
+
+void Triangle::print() const {
+  std::cout << "Triangle of : " << side1_ << " X " << side2_ << " X " << side3_
+            << std::endl;
+}
+
+double Triangle::get_area() const {
+  double s = (side1_ + side2_ + side3_) / 2;
+  return (std::sqrt(s * (s - side1_) * (s - side2_) * (s - side3_)));
+}
+
+double Triangle::get_perimeter() const { return side1_ + side2_ + side3_; }
+
+bool Triangle::is_valid() const {
+  bool fact1 = side1_ + side2_ > side3_;
+  bool fact2 = side1_ + side3_ > side2_;
+  bool fact3 = side2_ + side3_ > side1_;
+  return fact1 && fact2 && fact3;
+}
+
+---
+
+* main.cc
+
+```cpp
+#include <iostream>
+
+#include "circle.hpp"
+#include "ellipse.hpp"
+#include "rectangle.hpp"
+#include "square.hpp"
+#include "triangle.hpp"
+
+int main() {
+  Square square(5);
+  square.print();
+  std::cout << "area: " << square.get_area() << std::endl;
+  std::cout << "Perimeter: " << square.get_perimeter() << std::endl;
+  std::cout << std::endl;
+
+  Rectangle rectangle(5, 4);
+  rectangle.print();
+  std::cout << "area: " << rectangle.get_area() << std::endl;
+  std::cout << "Perimeter: " << rectangle.get_perimeter() << std::endl;
+  std::cout << std::endl;
+  std::cout << "Information about a triangle" << std::endl;
+
+  Triangle triangle(3, 4, 5);
+  triangle.print();
+  std::cout << "area: " << triangle.get_area() << std::endl;
+  std::cout << "Perimeter: " << triangle.get_perimeter() << std::endl;
+  std::cout << std::endl;
+  std::cout << "Information about a circle" << std::endl;
+
+  Circle circle(5);
+  circle.print();
+  std::cout << "area: " << circle.get_area() << std::endl;
+  std::cout << "Perimeter: " << circle.get_perimeter() << std::endl;
+  std::cout << std::endl;
+  std::cout << "Information about an ellipse" << std::endl;
+
+  Ellipse ellipse(5, 4);
+  ellipse.print();
+  std::cout << "area: " << ellipse.get_area() << std::endl;
+  std::cout << "Perimeter: " << ellipse.get_perimeter() << std::endl;
+  return 0;
+}
+```
+
+---
+
+## 다중 상속 (Multiple Inheritance) 시 문제점
+
+![center](Figure_12_8.png)
+
+* 상속 형태가 다이아몬드 상속 (diamond inheritance)
+  * 기반 클래스의 내용이 **여러 번 상속될 수 있음**
+* 다이아몬드 상속은 가상 기반 (virtual base) 또는 믹스인 클래스 (mixin class)를 사용해야 함
+
+---
+
+### 가상 기반 (Virtual Base)
+
+![center](Figure_12_9.png)
+
+* `virtual` 키워드를 사용해 상속 받은 클래스 멤버는 메모리 상에 하나만 존재하게 됨
+
+```cpp
+class Person { /* ... skipped ... */ };
+class Student: virtual public Person { /* ... skipped ... */ };
+class Professor: virtual public Person { /* ... skipped ... */ };
+class TA: public Student, public Professor { /* ... skipped ... */ };
+```
+
+---
+
+#### 가상 기반 예시
+
+```cpp
+class Base {
+ public:
+  int value;
+  virtual void FuncBase() { /* ... skipped ... */ }
+};
+
+class Derived1 : virtual public Base {
+ public:
+  void FuncBase() override {  /* ... skipped ... */  }
+  virtual void FuncDerived1() {  /* ... skipped ... */  }
+};
+
+class Derived2 : virtual public Base {
+ public:
+  virtual void FuncDerived2() {  /* ... skipped ... */  }
+};
+
+class MostDerived : public Derived1, public Derived2 {
+ public:
+  void FuncBase() override {  /* ... skipped ... */  }
+  void FuncDerived1() override {  /* ... skipped ... */ }
+};
+```
+
+---
+
+### 믹스인 클래스
+
+---
+
 ## Appendix A. `vptr`의 유무에 따른 객체 크기 비교
 
 ```cpp
@@ -692,6 +1342,7 @@ int main() {
 ## Appendix B. 가상 테이블의 포인터와 실제 멤버 함수 포인터 간 비교
 
 * test.hpp
+
 ```cpp
 #pragma once
 
@@ -718,6 +1369,8 @@ FuncPtr GetVirtualFunctionPointer(Base* obj, int index) {
   return reinterpret_cast<FuncPtr*>(*reinterpret_cast<void**>(obj))[index];
 }
 ```
+
+* In this code, a `Base*` pointer **can only call `Show()` and `Display()`** because that's the only virtual method declared in `Base`.
 
 ---
 
