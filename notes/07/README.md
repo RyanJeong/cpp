@@ -702,6 +702,8 @@ int main() {
 }
 ```
 
+---
+
 ## 형 변환 (Type Casting)
 
 * C++에서의 형 변환 방법은 4가지 (강한 타입 변환 규칙, explicit casting rules):
@@ -713,6 +715,8 @@ int main() {
   * C++은 정적 타입 검사 (static type checking)를 수행 (type safety 언어)
     * C 언어에서 가능한 변환이 C++에서는 안될 수 있음
   * C++ 형 변환 사용 권장
+
+---
 
 ### `static_cast`
 
@@ -774,34 +778,27 @@ int main() {
   * 원본 객체가 휘발성을 갖고 있을 때, `const_cast`를 사용해 휘발성을 제거할 경우
 
 ```cpp
-#include <iostream>
-
-void foo(const int& x) {
-  // We can't modify the x directly like this: x = 100;
-  // It's the only way to modify the parameter 'x'
-  int& ref_x = const_cast<int&>(x);  // Safely remove constness using const_cast
-  ref_x = 100;  // Modify the value of x through ref_x, x is now 100
+void foo(const int& i) {
+  // We can't modify the `i` directly like this: i = 100;
+  int& ref_i = const_cast<int&>(i);  // Safely remove constness using const_cast
+                                     // to modify the parameter `i`
+  ref_x = 100;  // Modify the value of `i` through `ref_i`, `i` is now 100
 }
 
 int main() {
-  int i = 0;  // 'i' is a normal object
-
+  int i = 0;  // `i` is a normal object
   const int& ref_i = i;
-  const_cast<int&>(ref_i) += 4;  // now the value of 'i' is 4
+  const_cast<int&>(ref_i) += 4;  // now the value of `i` is 4
   const int* ptr_i = &i;
-  *const_cast<int*>(ptr_i) += 5;  // now the value of 'i' is 9
-  std::cout << "The value of i: " << i << std::endl;
+  *const_cast<int*>(ptr_i) += 5;  // now the value of `i` is 9
 
-  const int j = 0;  // 'j' is a read-only object (constness)
-
+  const int j = 0;  // `j` is a read-only object (constness)
   const int& ref_j = j;
-  const_cast<int&>(ref_j) += 6;  // UB, we can't sure the value of 'j'
+  const_cast<int&>(ref_j) += 6;  // UB, we can't sure the value of `j`
   const int* ptr_j = &j;
-  *const_cast<int*>(ptr_j) = 7;  // UB, we can't sure the value of 'j'
+  *const_cast<int*>(ptr_j) = 7;  // UB, we can't sure the value of `j`
 
-  int x = 10;
-  foo(x);
-  std::cout << "The value of x: " << x << std::endl;
+  foo(i);  // now the value of `i` is 100
   return 0;
 }
 ```
@@ -810,7 +807,7 @@ int main() {
 
 ### `dynamic_cast`
 
-* 런타임 시점에 다운 캐스팅을 명시적으로 수행할 때 사용
+* 런타임 시점에 **다운 캐스팅**을 명시적으로 수행할 때 사용
 
 #### 다운 캐스팅 (Downcasting)
 
@@ -890,13 +887,18 @@ virtual double get_perimeter(0) = 0;
 
 * 클래스의 모든 멤버 함수가 순수 가상 함수인 경우
 * 상속 받을 클래스에게 청사진 (blue print)를 제공하기 위한 용도
-  * 인터페이스의 역할은 이를 상속 받는 클래스가 반드시 구현해야 할 메서드를 안내하기 위한 용도
+  * 인터페이스의 역할은 이를 상속 받는 클래스가 반드시 구현해야 할 속성을 강제함
 
 ![center](Figure_12_7.png)
 
-* 인터페이스 상속은 클래스 다이어그램에서 점선을 사용하며, 클래스 기호 내 `<<interface>>` 표시
+---
+
+### 클래스 다이어그램에서의 인터페이스
 
 ![center](Figure_12_Interface.png)
+
+* 점선을 사용하여 화살표 표시
+* 클래스 기호 내 `<<interface>>` 표시
 
 ---
 
@@ -1196,6 +1198,7 @@ bool Triangle::is_valid() const {
   bool fact3 = side2_ + side3_ > side1_;
   return fact1 && fact2 && fact3;
 }
+```
 
 ---
 
@@ -1252,9 +1255,9 @@ int main() {
 
 ![center](Figure_12_8.png)
 
-* 상속 형태가 다이아몬드 상속 (diamond inheritance)
-  * 기반 클래스의 내용이 **여러 번 상속될 수 있음**
-* 다이아몬드 상속은 가상 기반 (virtual base) 또는 믹스인 클래스 (mixin class)를 사용해야 함
+* 상속 형태가 다이아몬드 상속 (diamond inheritance)일 경우 문제가 될 수 있음
+  * **기반 클래스 내용이 여러 번 상속될 수 있음**
+* 다이아몬드 상속 시 가상 기반 (virtual base) 또는 믹스인 클래스 (mixin class)를 사용할 것
 
 ---
 
@@ -1262,7 +1265,11 @@ int main() {
 
 ![center](Figure_12_9.png)
 
-* `virtual` 키워드를 사용해 상속 받은 클래스 멤버는 메모리 상에 하나만 존재하게 됨
+* `virtual` 키워드를 사용해 상속 받은 클래스의 실체화:
+  1. 일반 상속 객체를 먼저 실체화한다.
+  2. 가상 기반 객체 (subobject)를 실체화하되, **실체화될 객체에 하나만 포함되도록 실체화한다**.
+* 가상 기반 사용 시 가상 기반 포인터 (`vbptr`)와 가상 기반 테이블 (`vbtable`)이 추가됨
+* 가상 기반 포인터는 컴파일 시점에 고정된 인덱스를 사용할 수 있도록 처리됨
 
 ```cpp
 class Person { /* ... skipped ... */ };
@@ -1273,36 +1280,560 @@ class TA: public Student, public Professor { /* ... skipped ... */ };
 
 ---
 
-#### 가상 기반 예시
+#### 가상 기반 동작 방식
+
+##### 설명을 위한 가정
+
+Architecture: 16-bit addresses (2 bytes per address).
+Pointer Size: 2 bytes.
+Integer Size: 2 bytes.
+Endianness: Little-endian (least significant byte first).
 
 ```cpp
 class Base {
- public:
-  int value;
-  virtual void FuncBase() { /* ... skipped ... */ }
-};
+  int value = 0;
 
+ public:
+  virtual void FuncBase() { /* ... */ }
+};
+```
+
+```text
+Address   Content(Hex)   Description
+0x1000    00 20          vptr_Base (points to 0x2000)
+0x1002    00 00          int value (initialized to 0)
+...
+0x2000    00 30          Pointer to Base::FuncBase() (0x3000)
+```
+
+---
+
+```cpp
 class Derived1 : virtual public Base {
  public:
-  void FuncBase() override {  /* ... skipped ... */  }
-  virtual void FuncDerived1() {  /* ... skipped ... */  }
+  void FuncBase() override { /* ... */ }
+  virtual void FuncDerived1() { /* ... */ }
 };
+```
 
+```text
+Address   Content(Hex)   Description
+0x1100    00 22          vptr_Derived1 (points to 0x2200)
+0x1102    00 21          vbptr_Derived1 (points to vbtable at 0x2100)
+                         -- Base Subobject within Derived1 --
+0x1104    00 20          vptr_Base (points to 0x2000)
+0x1106    00 00          int value (initialized to 0)
+                         -- Base Subobject within Derived1 --
+...
+0x2000    00 30          Pointer to Base::FuncBase() (0x3000)
+...
+0x2100    02 00          Offset to Base subobject (+2 bytes)
+...
+0x2200    00 31          Pointer to Derived1::FuncBase() (0x3100)
+0x2202    00 32          Pointer to Derived1::FuncDerived1() (0x3200)
+```
+
+---
+
+```cpp
 class Derived2 : virtual public Base {
  public:
-  virtual void FuncDerived2() {  /* ... skipped ... */  }
+  virtual void FuncDerived2() { /* ... */ }
 };
+```
 
+```text
+Address   Content(Hex)   Description
+0x1200    00 24          vptr_Derived2 (points to 0x2400)
+0x1202    00 23          vbptr_Derived2 (points to vbtable at 0x2300)
+                         -- Base Subobject within Derived2 --
+0x1204    00 20          vptr_Base (points to 0x2000)
+0x1206    00 00          int value (initialized to 0)
+                         -- Base Subobject within Derived2 --
+...
+0x2000    00 30          Pointer to Base::FuncBase() (0x3000)
+...
+0x2300    02 00          Offset to Base subobject (+2 bytes)
+...
+0x2400    00 30          Pointer to Base::FuncBase() (0x3000)
+0x2402    00 33          Pointer to Derived2::FuncDerived2() (0x3300)
+```
+
+---
+
+```cpp
 class MostDerived : public Derived1, public Derived2 {
  public:
-  void FuncBase() override {  /* ... skipped ... */  }
-  void FuncDerived1() override {  /* ... skipped ... */ }
+  void FuncBase() override { /* ... */ }
+  void FuncDerived1() override { /* ... */ }
+  virtual void FuncMostDerived() { /* ... */ }
+};
+```
+
+```text
+Address   Content(Hex)   Description
+0x1300    00 25          vptr_Derived1 (points to 0x2500)
+0x1302    00 27          vbptr_Derived1 (points to vbtable at 0x2700)
+0x1304    00 26          vptr_Derived2 (points to 0x2600)
+0x1306    00 28          vbptr_Derived2 (points to vbtable at 0x2800)
+                         -- Shared Base Subobject within MostDerived --
+0x1308    00 20          vptr_Base (points to 0x2000)
+0x130A    00 00          int value (initialized to 0)
+                         -- Shared Base Subobject within MostDerived --
+...
+0x2000    00 30          Pointer to Base::FuncBase() (0x3000)
+...
+0x2500    00 34          Pointer to MostDerived::FuncBase() (0x3400)
+0x2502    00 35          Pointer to MostDerived::FuncDerived1() (0x3500)
+...
+0x2600    00 34          Pointer to MostDerived::FuncBase() (0x3400)
+0x2602    00 33          Pointer to Derived2::FuncDerived2() (0x3300)
+0x2604    00 36          Pointer to MostDerived::FuncMostDerived() (0x3600)
+...
+0x2700    06 00          Offset to Base subobject (+6 bytes)
+...
+0x2800    02 00          Offset to Base subobject (+2 bytes)
+```
+
+---
+
+#### 가상 기반 예시
+
+* person.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+class Person {
+ protected:
+  std::string name_;
+
+ public:
+  explicit Person(const std::string& name);
+  ~Person() = default;
+  void print() const;
 };
 ```
 
 ---
 
+* person.cc
+
+```cpp
+#include "person.hpp"
+
+#include <iostream>
+
+Person::Person(const std::string& nm) : name_(nm) {}
+
+void Person::print() const {
+  std::cout << "Person" << std::endl;
+  std::cout << "Name: " << name_ << std::endl << std::endl;
+}
+```
+
+---
+
+* student.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+#include "person.hpp"
+
+class Student : virtual public Person {
+ protected:
+  double gpa_;
+
+ public:
+  Student(const std::string& name, double gpa);
+  ~Student() = default;
+  void print() const;
+};
+```
+
+---
+
+* student.cc
+
+```cpp
+#include "student.hpp"
+
+#include <cassert>
+#include <iostream>
+
+Student::Student(const std::string& name, double gp) : Person(name), gpa_(gp) {
+  assert(gpa_ <= 4.0);
+}
+
+void Student::print() const {
+  std::cout << "Student " << std::endl;
+  std::cout << "Name: " << name_ << " ";
+  std::cout << "GPA: " << gpa_ << std::endl << std::endl;
+}
+```
+
+---
+
+* professor.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+#include "person.hpp"
+
+class Professor : virtual public Person {
+ protected:
+  double salary_;
+
+ public:
+  Professor(const std::string& name, double salary);
+  ~Professor() = default;
+  void print() const;
+};
+```
+
+---
+
+* professor.cc
+
+```cpp
+#include "professor.hpp"
+
+#include <iostream>
+
+Professor::Professor(const std::string& nm, double sal)
+    : Person(nm), salary_(sal) {}
+
+void Professor::print() const {
+  std::cout << "Professor " << std::endl;
+  std::cout << "Name: " << name_ << " ";
+  std::cout << "Salary: " << salary_ << std::endl << std::endl;
+}
+```
+
+---
+
+* ta.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+#include "professor.hpp"
+#include "student.hpp"
+
+class TA : public Professor, public Student {
+ public:
+  TA(const std::string& name, double gpa, double sal);
+  ~TA() = default;
+  void print() const;
+};
+```
+
+---
+
+* ta.cc
+
+```cpp
+#include "ta.hpp"
+
+#include <iostream>
+
+TA::TA(const std::string& nm, double gp, double sal)
+    : Person(nm), Professor(nm, sal), Student(nm, gp) {}
+
+void TA::print() const {
+  std::cout << "Teaching Assistance: " << std::endl;
+  std::cout << "Name: " << name_ << " ";
+  std::cout << "GPA: " << gpa_ << " ";
+  std::cout << "Salary: " << salary_ << std::endl << std::endl;
+}
+```
+
+---
+
+* main.cc
+
+```cpp
+#include "ta.hpp"
+
+int main() {
+  Person person("John");
+  person.print();
+  Student student("Anne", 3.9);
+  student.print();
+  Professor professor("Lucie", 78000);
+  professor.print();
+  TA ta("George", 3.2, 20000);
+  ta.print();
+  return 0;
+}
+```
+
+---
+
 ### 믹스인 클래스
+
+* 인터페이스를 사용해 **주입할 속성**을 정의
+* 속성 주입 목적의 인터페이스를 상속 받은 클래스는 주입 받은 속성을 구현해야만 실체화할 수 있음
+
+![center](Figure_12_10.png)
+
+---
+
+#### 믹스인 클래스 예시
+
+* stdtype.hpp
+
+```cpp
+#pragma once
+
+class StdType {
+ protected:
+  double gpa_;
+
+ public:
+  virtual void print_gpa() const = 0;
+};
+```
+
+---
+
+* prftype.hpp
+
+```cpp
+#pragma once
+
+class PrfType {
+ protected:
+  double salary_;
+
+ public:
+  virtual void print_salary() const = 0;
+};
+```
+
+---
+
+* person.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+class Person {
+ protected:
+  std::string name_;
+
+ public:
+  explicit Person(const std::string& name);
+  ~Person() = default;
+  void print() const;
+};
+```
+
+---
+
+* person.cc
+
+```cpp
+#include "person.hpp"
+
+#include <iostream>
+
+Person::Person(const std::string& nm) : name_(nm) {}
+
+void Person::print() const { std::cout << "Name: " << name_ << std::endl; }
+```
+
+---
+
+* student.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+#include "person.hpp"
+#include "stdtype.hpp"
+
+class Student : public Person, public StdType {
+ public:
+  Student(const std::string& name, double gpa);
+  ~Student() = default;
+  void print_gpa() const override;
+  void print() const;
+};
+```
+
+---
+
+* student.cc
+
+```cpp
+#include "student.hpp"
+
+#include <iomanip>
+#include <iostream>
+
+Student::Student(const std::string& name, double gp) : Person(name) {
+  gpa_ = gp;
+}
+
+void Student::print_gpa() const {
+  std::cout << "GPA: " << std::fixed << std::setprecision(2) << gpa_
+            << std::endl;
+}
+
+void Student::print() const {
+  Person::print();
+  print_gpa();
+}
+```
+
+---
+
+* professor.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+#include "person.hpp"
+#include "prftype.hpp"
+
+class Professor : public Person, public PrfType {
+ public:
+  Professor(const std::string& name, double salary);
+  ~Professor() = default;
+  void print_salary() const override;
+  void print() const;
+};
+```
+
+---
+
+* professor.cc
+
+```cpp
+#include "professor.hpp"
+
+#include <iomanip>
+#include <iostream>
+
+Professor::Professor(const std::string& nm, double sal) : Person(nm) {
+  salary_ = sal;
+}
+
+void Professor::print_salary() const {
+  std::cout << "Salary: ";
+  std::cout << std::fixed << std::setprecision(2) << salary_ << std::endl;
+}
+
+void Professor::print() const {
+  Person::print();
+  print_salary();
+}
+```
+
+---
+
+* ta.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+#include "person.hpp"
+#include "prftype.hpp"
+#include "stdtype.hpp"
+
+class TA : public Person, public StdType, public PrfType {
+ public:
+  TA(const std::string& name, double gpa, double sal);
+  ~TA() = default;
+  void print_gpa() const override;
+  void print_salary() const override;
+  void print() const;
+};
+```
+
+---
+
+* ta.cc
+
+```cpp
+#include "ta.hpp"
+
+#include <iomanip>
+#include <iostream>
+
+TA::TA(const std::string& nm, double gp, double sal) : Person(nm) {
+  gpa_ = gp;
+  salary_ = sal;
+}
+
+void TA::print_gpa() const { std::cout << "GPA: " << gpa_ << std::endl; }
+
+void TA::print_salary() const {
+  std::cout << "Salary: ";
+  std::cout << std::fixed << std::setprecision(2) << salary_ << std::endl;
+}
+
+void TA::print() const {
+  Person::print();
+  print_gpa();
+  print_salary();
+}
+```
+
+---
+
+* main.cc
+
+```cpp
+#include <iostream>
+
+#include "professor.hpp"
+#include "student.hpp"
+#include "ta.hpp"
+
+int main() {
+  std::cout << "Information about person" << std::endl;
+  Person per("John");
+  per.print();
+  std::cout << std::endl;
+
+  std::cout << "Information about student" << std::endl;
+  Student std("Linda", 3.9);
+  std.print();
+  std::cout << std::endl;
+
+  std::cout << "Information about professor" << std::endl;
+  Professor prf("George", 89000);
+  prf.print();
+  std::cout << std::endl;
+
+  std::cout << "Information about teaching assistance " << std::endl;
+  TA ta("Lucien", 3.8, 23000);
+  ta.print();
+  std::cout << std::endl;
+
+  return 0;
+}
+```
 
 ---
 
