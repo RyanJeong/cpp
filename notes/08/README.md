@@ -371,9 +371,11 @@ int calc_with_dynamic_fraction_object() {
 ![center](Figure_13_8.png)
 
 * **스마트 포인터는 특정 지역에서 동적 할당한 객체가 해당 지역을 벗어날 때 자동으로 소멸됨을 보장**
-* 클래스 내 데이터 멤버가 포인터를 사용할 경우, 아래와 같은 연산자 오버로딩이 필요함
+* 클래스 내 데이터 멤버가 포인터를 사용할 경우, 두 연산자 재정의 필요
   * 간접 (역참조) 연산자 (indirection operator, `*`)
   * 멤버 선택 연산자 (member-selector operator, `->`)
+
+---
 
 ```cpp
 class Fraction;  // Forward declaration for the type you want to use
@@ -399,7 +401,7 @@ int main() {
 
 ### 배열 클래스 (Array Class)
 
-* 첨자 연산을 필요로 하는 클래스 구현 시 첨자 (subscript) 연산자 오버로딩 필요
+* 첨자 연산을 필요로 하는 클래스 구현 시 첨자 (subscript) 연산자 재정의 필요
   * 클래스가 내부적으로 문자열 또는 리스트와 같이 배열처럼 사용되는 데이터를 사용하는 경우
 * 첨자 연산자는 이항 연산자
   * 좌측 피연산자는 배열의 이름 역할 수행
@@ -415,3 +417,79 @@ int main() {
 
 ---
 
+```cpp
+#include <cassert>
+#include <iostream>
+
+class Array {
+  double* ptr_;
+  int size_;
+
+ public:
+  explicit Array(int s) : size_(s) { ptr_ = new double[size_]; }
+  ~Array() { delete[] ptr_; }
+
+  // Accessor
+  double operator[](int index) const {
+    if (index < 0 || index >= size_) {
+      std::cerr << "Index is out of range. Program terminates.";
+      assert(false);
+    }
+    return ptr_[index];
+  }
+
+  // Mutator
+  double& operator[](int index) {
+    if (index < 0 || index >= size_) {
+      std::cerr << "Index is out of range. Program terminates.";
+      assert(false);
+    }
+    return ptr_[index];
+  }
+};
+
+int main() {
+  Array arr(3);
+  arr[0] = 22.31;
+  arr[1] = 78.61;
+  arr[2] = 65.22;
+  for (int i = 0; i < 3; i++)
+    std::cout << "Value of arr [" << i << "]: " << arr[i] << std::endl;
+  return 0;
+}
+```
+
+---
+
+### 펑터 (Functor)
+
+* 함수 호출 연산자를 재정의하여 **함수의 상태를 유지하는 함수 객체를 생성할 수 있음**
+  * 객체로부터 함수를 호출할 수 있는 형태
+  * 객체 내 데이터 멤버에 유지하고자 하는 정보 보관
+
+```cpp
+#include <iostream>
+#include <limits>
+
+class Smallest {
+  int value_;
+
+ public:
+  Smallest() : value_(std::numeric_limits<int>::max()) {}
+
+  // function call operator
+  int operator()(int next) {
+    if (next < value_) value_ = next;
+    return value_;
+  }
+};
+
+int main() {
+  Smallest smallest;
+  std::cout << "Smallest so far: " << smallest(100)
+            << std::endl;  // Functor CAN keep their state.
+  std::cout << "Smallest so far: " << smallest(50) << std::endl;
+  std::cout << "Smallest so far: " << smallest(30) << std::endl;
+  return 0;
+}
+```
