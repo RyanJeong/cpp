@@ -248,7 +248,7 @@ int main() {
 
 ![center](Figure_14_3.png)
 
-* 예외 발생과 처리를 둘 다 책임지는 형태
+* 예외 발생과 예외 처리를 모두 책임지는 형태
 
 ---
 
@@ -287,7 +287,7 @@ int main() {
 * 이 형태는 예외를 발생하는 부분과 예외를 처리하는 부분이 분리된 형태
   * 주로 외부 함수를 이용해야 할 때 사용하는 형태
     * 외부 함수의 구현은 모르더라도 해당 함수의 예외 형태들만 파악하면 예외 처리 가능
-  * 예외 발생부는 함수 구현 안에 포함되어 있으므로, 함수로부터 발생하는 예외만 책임지면 됨
+  * 예외 발생부는 함수 구현 안에 포함되어 있으므로, 함수로부터 발생하는 예외만 처리하면 됨
   * C++ 라이브러리 함수들은 대부분 이러한 형태로 작성되어 있음
 
 ---
@@ -325,7 +325,7 @@ int main() {
 
 ![center](Figure_14_5.png)
 
-* 예외 발생과 처리의 책임을 호출할 함수와 함수 호출 측 양쪽에 분담하는 형태
+* 함수 호출부와 피호출부에서 예외 발생과 예외 처리를 모두 책임지는 형태
 
 ---
 
@@ -354,6 +354,9 @@ int main() {
 
 * 라이브러리 함수 혹은 외부 함수 (e.g., 오픈 소스 라이브러리)는 대부분 구현이 감춰져 있음
   * 외부로 공개되는 정보는 해당 함수의 선언이 담겨 있는 헤더 파일
+
+![center](Figure_14_operator_new.png)
+
 * **헤더 파일 내에 해당 함수가 예외를 발생하는지 표현되어 있음**
   * 예외 가능성이 있는 함수 호출 시 try-catch 블록을 사용하여 호출해야 함
   * 만약 try-catch 블록 미사용 시 호출한 함수에서 발생할 예외를 처리할 수 없음
@@ -379,3 +382,284 @@ try {
   // do something
 }
 ```
+
+---
+
+### 예외 전파 (Exception Propagation)
+
+![center](Figure_14_8.png)
+
+* 예외 발생은 반드시 try-catch 블록에 작성할 필요는 없음
+  * e.g., 발생한 예외를 다른 곳에서 처리해야 하는 경우
+* 발생한 예외는 이와 연관된 `catch` 절을 발견할 때까지 함수 호출 스택을 거슬러 올라감
+* 예외 전파는 `main` 함수까지만 가능
+* `main` 함수에서 발생된 예외를 처리하지 못 하면 런타임 오류 발생
+  * 런타임 시스템으로 발생된 예외가 도달하면 프로그램은 즉시 종료됨
+
+---
+
+### 예외 전달 (Rethrowing an Exception)
+
+* 예외 발생 시 즉시 처리하지 않고 다른 곳에서 처리하도록 전달하는 형태
+  * 예외 전파 특성을 응용한 형태
+
+#### 예외 발생 시 즉시 상위 호출 함수로 예외를 전달하는 형태
+
+```cpp
+// do something
+if (unsatisfied_condition_a) throw var;
+```
+
+#### 예외 발생 시 일부 작업을 수행한 후 상위 호출 함수로 예외를 전달하는 형태
+
+* e.g., 로깅, 동적 할당 해제, etc.
+
+```cpp
+try {
+  // do something
+  if (unsatisfied_condition_a) throw var;
+} catch (const type& var) {  // Specific type catch
+  // Some work at here
+  throw;  // Re-throw the exception to the calling function
+}
+```
+
+---
+
+### 예외 사양 (Exception Specification)
+
+* 함수 선언 시 해당 함수의 예외 발생 가능성을 표현
+
+#### Any Exception
+
+```cpp
+type function_name(parameters);  // Prototype with no specification
+```
+
+* 일반적인 함수 헤더와 형태는 동일
+* 함수 헤더에 예외와 관련한 내용을 표현하지 않았으나, 예외를 반환할 수도 있음
+* 예외 반환 여부를 판단하려면 해당 함수의 구현을 직접 확인하거나 관련 자료를 찾아야 함
+
+---
+
+#### Pre-defined Exceptions
+
+```cpp
+type function_name(parameters) throw(type1, type2, ..., type_n);
+```
+
+* 함수에서 발생하는 모든 예외의 형을 열거하여 표현하는 형태
+
+#### No Exception
+
+```cpp
+type foo(params) throw();   // Textbook uses it (not recommended)
+type bar(params) noexcept;  // Google STRONGLY recommends using this!
+```
+
+* 함수가 예외를 반환하지 않음을 선언하는 형태
+* 예외를 반환하지 않도록 선언된 함수는 런타임 시 예외 검사를 하지 않음
+  * 런타임 시스템에서 예외 검사를 하지 않음
+  * 실행 속도 측면에서 이점이 있음
+
+```cpp
+int foo() noexcept { throw 1; }
+
+int main() {
+  try {
+    foo();
+  } catch (const int x) {
+    // this catch clause can't catch foo's exception
+  }
+  return 0;
+}
+```
+
+---
+
+## 스택 풀기 (Stack Unwinding)
+
+* 스택 영역에 보관되어 있는 함수 호출 스택을 풀어나가는 과정
+
+### 메모리 레이아웃
+
+* 런타임 시스템은 프로그램 실행 시 네 개의 프로그램 메모리 영역을 지정함
+  * Code memory (or program memory)
+    * 프로그램이 실행되는 동안 수행되어야 할 명령어 보관
+  * Static mamory
+    * 전역 변수 혹은 정적 변수 보관
+  * Stack memory
+    * 스택 컨테이너와 동작 방식이 흡사한 영역 (LIFO - Last In, First Out)
+    * 프로그램 실행 과정에서 호출된 함수는 세 가지 정보를 지속적으로 스택 메모리에 관리함:
+      1. Values of parameters
+      2. Values of local variables
+      3. The return address of the calling function in code memory
+  * Heap memory
+    * 프로그램에 의해 할당된 객체 보관
+    * 힙 메모리 객체들의 생애주기는 필요에 의해 직접 제어할 수 있음
+
+---
+
+### 에외 처리의 동작 과정
+
+* **스택 풀기**를 기반으로 동작
+  * 예외가 발생하면 해당 예외를 받을 수 있는 `catch` 절을 찾으려고 시도함
+  * `catch` 절이 없는 함수는 상위 호출 함수로 이동하기 위해 해당 함수 호출 스택 제거
+    * 해당 함수 호출 스택에 상위 호출 함수의 주소가 기록되어 있음
+
+#### 함수 호출 스택이 쌓이는 과정
+
+* 호출 스택은 매개변수 목록, 지역변수 목록, 상위 호출 함수의 주소 순으로 기록된다고 가정
+
+![center](Figure_14_9.png)
+
+---
+
+#### 스택 풀기를 하는 과정
+
+![center](Figure_14_10.png)
+
+---
+
+### 클래스 예외 처리
+
+* 클래스 멤버 함수 내에서도 예외를 던질 수 있음
+* 일반 멤버 함수에서의 예외 처리는 일반 함수와 동일
+
+#### 소멸자에서의 예외 처리
+
+* C++11 이후 모든 소멸자는 `noexcept`
+* 소멸자 내에서 try-catch를 사용해 예외를 처리할 순 있으나, **예외 전파**를 할 수 없음
+  * 소멸자에서 예외 전파를 하면 C++ 표준 라이브러리 함수인 `std::terminate()`가 호출됨
+  * `std::terminate()`가 호출되면 프로그램은 즉시 종료됨
+
+#### 생성자에서의 예외 처리
+
+* 생성자의 동작 흐름:
+  1. 클래스의 생성자가 호출되면 메모리에 생성할 객체를 미리 할당한다.
+  2. 호출된 생성자는 메모리에 객체 공간을 미리 할당한다.
+  3. 생성자에서 초기화 목록과 본문을 통해 만들어진 객체를 초기화한다.
+  4. 생성자의 모든 동작이 종료되며, **해당 객체는 소멸 시점에 소멸자가 자동 호출됨이 보장된다.**
+  * **생성이 완료되지 않은 객체의 소멸자를 호출하지 않는 것이 규칙**
+    * 미완성된 객체를 소멸하는 과정 중에 발생할 수 있는 오류를 미리 예방하기 위함
+
+---
+
+* 스택 메모리를 사용하는 데이터 멤버를 가진 클래스의 생성자가 정상 동작한 경우
+  * 객체 소멸 시점에 **소멸자**에 의해 안전하게 소멸됨
+
+![center](Figure_14_11.png)
+
+---
+
+* 스택 메모리를 사용하는 데이터 멤버를 가진 클래스의 생성자가 동작 도중에 예외가 발생한 경우
+  * 객체 소멸 시점에 **소멸자**가 호출되진 않으나, **스택 풀기**를 통해 안전하게 제거됨
+
+![center](Figure_14_12.png)
+
+---
+
+* 일부 힙 메모리를 사용하는 데이터 멤버를 가진 클래스의 생성자가 정상 동작한 경우
+  * 객체 소멸 시점에 **소멸자**에 의해 안전하게 소멸됨
+
+![center](Figure_14_13.png)
+
+---
+
+* 일부 힙 메모리를 사용하는 데이터 멤버를 가진 클래스의 생성자가 동작 도중에 예외가 발생한 경우
+  * 객체 소멸 시점에 **소멸자**가 호출되지 않음
+  * **스택 풀기**를 통해 스택 메모리 객체들은 자동 소멸되지만 **힙 영역 메모리**는 소멸되지 않음
+
+![center](Figure_14_14.png)
+
+---
+
+* 일부 힙 메모리를 사용하는 데이터 멤버를 가진 클래스의 생성자가 동작 도중에 예외가 발생한 경우
+  * **스마트 포인터를 사용하면 스택 풀기 과정을 통해 힙 객체도 소멸됨을 보장**
+
+![center](Figure_14_15.png)
+
+---
+
+#### 생성자에서의 예외 처리 : Function-try 블록
+
+![center](Figure_14_16.png)
+
+* 생성자의 초기화 목록이나 생성자 본문에서 발생한 예외를 처리할 수 있음
+  * Try-catch 블록은 생성자 본문만 예외를 처리할 수 있음
+* Function-try 블록의 `try` 절이 생성자 본문 역할을 수행함
+
+---
+
+```cpp
+#include <iostream>
+#include <string>
+
+class MyClass {
+  int i_;
+
+ public:
+  MyClass() try
+      : i_(0) {  // Handling exceptions in the function-try block if they occur
+                 // during construction.
+    if (i_ == 0) throw std::string("Integer is zero.");
+  } catch (const std::string& e) {
+    std::cerr << "MyClass constructor caught an exception: " << e << std::endl;
+    throw;  // Re-throwing the exception to propagate it to the caller.
+  }
+};
+
+int main() {
+  try {
+    MyClass obj;
+  } catch (const std::string& e) {
+    std::cerr << "Main caught an exception: " << e << std::endl;
+  }
+  return 0;
+}
+```
+
+---
+
+## 표준 예외 클래스
+
+![center](Figure_14_17.png)
+
+* `exception` 클래스의 public 인터페이스
+
+```cpp
+exception() noexcept // constructor	
+exception(const exception&) noexcept  // copy constructor
+exception& operator=(const exception&) noexcept // Assignment operator
+virtual ~exception() noexcept // destructor	
+virtual const char* what() const noexcept // member function
+```
+
+---
+
+### 표준 예외 클래스를 활용하는 예: 상속을 통한 예외 재정의
+
+```cpp
+#include <exception>
+#include <string>
+
+class MyClassException : public std::exception {
+ public:
+  MyClassException(const std::string& what, const std::string& where) noexcept;
+  ~MyClassException() noexcept override = default;
+
+  const char* what() const noexcept override;
+  const char* where() const noexcept;
+
+ private:
+  const std::string what_;
+  const std::string where_;
+};
+
+MyClassException::MyClassException(const std::string& what,
+                                   const std::string& where) noexcept
+    : what_(what), where_(where) {}
+const char* MyClassException::what() const noexcept { return what_.c_str(); }
+const char* MyClassException::where() const noexcept { return where_.c_str(); }
+```
+
