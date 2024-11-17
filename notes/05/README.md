@@ -191,7 +191,7 @@ str += "fg";
 
 ### 간단한 C++ 문자열 클래스 구현
 
-* `mystring.hpp`
+* mystring.hpp
 
 ```cpp
 #pragma once
@@ -220,7 +220,7 @@ class MyString {
 
 ---
 
-* `mystring.cc - 1`
+* mystring.cc - 1
 
 ```cpp
 #include "mystring.hpp"
@@ -251,7 +251,7 @@ MyString::~MyString() { delete[] string_; }
 
 ---
 
-* `mystring.cc - 2`
+* mystring.cc - 2
 
 ```cpp
 MyString& MyString::Insert(int pos, const MyString& str) {
@@ -295,7 +295,7 @@ MyString& MyString::Insert(int pos, const MyString& str) {
 
 ---
 
-* `mystring.cc - 3`
+* mystring.cc - 3
 
 ```cpp
 MyString& MyString::Insert(int pos, const char* str) {
@@ -336,7 +336,7 @@ void MyString::println() const {
 
 ---
 
-* `main.cc`
+* main.cc
 
 ```cpp
 #include <iostream>

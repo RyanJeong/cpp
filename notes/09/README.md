@@ -645,6 +645,8 @@ virtual const char* what() const noexcept // member function
 ### 표준 예외 클래스를 활용하는 예: 상속을 통한 예외 재정의
 
 ```cpp
+#pragma once
+
 #include <exception>
 #include <string>
 
@@ -667,4 +669,3 @@ MyClassException::MyClassException(const std::string& what,
 const char* MyClassException::what() const noexcept { return what_.c_str(); }
 const char* MyClassException::where() const noexcept { return where_.c_str(); }
 ```
-

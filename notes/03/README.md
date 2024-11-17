@@ -819,7 +819,7 @@ g++ -o application *.cpp
 
 ### 실습 - 불변 속성을 지키는 클래스 분할 컴파일
 
-* `rectangle.hpp`
+* rectangle.hpp
 
 ```cpp
 #pragma once
@@ -842,7 +842,7 @@ class Rectangle {
 
 ---
 
-* `rectangle.cc`
+* rectangle.cc
 
 ```cpp
 #include "rectangle.hpp"
@@ -873,7 +873,7 @@ double Rectangle::get_perimeter() const { return 2 * (length_ + height_); }
 
 ---
 
-* `main.cc`
+* main.cc
 
 ```cpp
 #include <iostream>
@@ -989,7 +989,7 @@ int count = rect.get_count();
 
 ### 실습 - 정적 멤버가 추가된 클래스
 
-* `rectangle.hpp`
+* rectangle.hpp
 
 ```cpp
 #pragma once
@@ -1014,7 +1014,7 @@ class Rectangle {
 
 ---
 
-* `rectangle.cc`
+* rectangle.cc
 
 ```cpp
 #include "rectangle.hpp"
@@ -1050,7 +1050,7 @@ double Rectangle::get_perimeter() const { return 2 * (length_ + height_); }
 
 ---
 
-* `main.cc`
+* main.cc
 
 ```cpp
 #include <iostream>
