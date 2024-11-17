@@ -1,667 +1,898 @@
-# C++ Tutorial
-## 10 - 연산자 오버로딩 2
-###### [뒤로가기](/tutorial/#index)
 ---
-### `friend` 키워드
-#### `friend` 남용은 구현 디테일은 최대한 숨기는 캡슐화의 원칙과 충돌하므로, 최대한 사용을 지양할 것
-* `friend` 키워드로 정의된 클래스 또는 외부 함수는 해당 클래스의 `private` 멤버 변수나 메서드에 접근 가능:
-  ```cpp
-  class A {
-   private:
-    void private_func() {}
-    int private_num;
-
-    // B 는 A 의 친구!
-    friend class B;
-
-    // func 은 A 의 친구!
-    friend void func();
-  };
-
-  class B {
-   public:
-    void b() {
-      A a;
-
-      // 비록 private 함수의 필드들이지만 `친구`이기 때문에 접근 가능
-      a.private_func();
-      a.private_num = 2;
+marp: true
+theme: notes
+style: |
+    img[alt~="center"] {
+      display: block;
+      margin: 0 auto;
     }
-  };
-
-  void func() {
-    A a;
-
-    // 비록 private 함수의 필드들이지만 `친구`이기 때문에 접근 가능
-    a.private_func();
-    a.private_num = 2;
-  }
-
-  int main() {}
-  ```
-
-* `friend`를 이항 연산자 오버로딩에 활용할 수 있음:
-  ```cpp
-  a = a + "-1.1 + i3.923";  // 1 
-  a = "-1.1 + i3.923" + a;  // 2 
-  ```
-  * `1` 같은 경우, 컴파일러가 `a.operator+("-1.1 + i3.923")`와 같이 처리할 수 있음
-  * `2` 같은 경우, 컴파일러가 올바르게 처리할 수 없음
-  * 이항 연산자 오버로딩 시 다음과 같은 두 경우를 모두 처리할 수 있어야 함
-  * 컴파일러는 어떤 임의의 이항 연산자 `@`에 대해, `a @ b`는 다음 두 방식으로 해석:
-  ```cpp
-  a.operator@(b);   // 1
-  operator@(a, b);  // 2
-  ```
-  * `1` 같은 경우, `a`의 멤버함수를 호출
-  * `2` 같은 경우, 외부에 정의되어 있는 일반 함수 호출
-  * `friend` 키워드를 사용하면 `2` 같은 경우도 컴파일러가 올바르게 처리할 수 있음
-
-* <b>이항 연산자 구현 시 중요 규칙</b>:
-  * 자기 자신을 반환하지 않는 이항 연산(`+`, `-`, ...)은 <b>`friend` 키워드를 사용해 외부함수로 구현</b>
-  * 자기 자신을 반환하는 이항 연산(`+=`, `-=`, ...)은 <b>멤버함수로 구현</b>
-
-* `friend` 키워드를 사용해 이항 연산자를 구현한 예:
-  ```cpp
-  #include <iostream>
-  #include <cstring>
-
-  class Complex {
-  private:
-    double real_, img_;
-
-    double get_number(const char* str, int from, int to) const;
-
-  public:
-    Complex(double real, double img) : real_(real), img_(img) {}
-    Complex(const Complex& c) { real_ = c.real_, img_ = c.img_; }
-    Complex(const char* str);  // [NOLINT]
-
-    // .... (생략) ....
-
-    friend Complex operator+(const Complex& a, const Complex& b);
-    friend Complex operator-(const Complex& a, const Complex& b);
-    friend Complex operator*(const Complex& a, const Complex& b);
-    friend Complex operator/(const Complex& a, const Complex& b);
-
-    void println() {
-      std::cout << "( " << real_ << " , " << img_ << " ) " << std::endl;
-    }
-  };
-
-  Complex::Complex(const char* str) {
-    // 입력 받은 문자열을 분석하여 real 부분과 img 부분을 찾아야 한다.
-    // 문자열의 꼴은 다음과 같습니다 "[부호](실수부)(부호)i(허수부)"
-    // 이 때 맨 앞의 부호는 생략 가능합니다. (생략시 + 라 가정)
-
-    int begin = 0, end = strlen(str);
-    img_ = 0.0;
-    real_ = 0.0;
-
-    // 먼저 가장 기준이 되는 'i' 의 위치를 찾는다.
-    int pos_i = -1;
-    for (int i = 0; i != end; i++) {
-      if (str[i] == 'i') {
-        pos_i = i;
-        break;
-      }
-    }
-
-    // 만일 'i' 가 없다면 이 수는 실수 뿐이다.
-    if (pos_i == -1) {
-      real_ = get_number(str, begin, end - 1);
-      return;
-    }
-
-    // 만일 'i' 가 있다면,  실수부와 허수부를 나누어서 처리하면 된다.
-    real_ = get_number(str, begin, pos_i - 1);
-    img_ = get_number(str, pos_i + 1, end - 1);
-
-    if (pos_i >= 1 && str[pos_i - 1] == '-') img_ *= -1.0;
-  }
-  double Complex::get_number(const char* str, int from, int to) const {
-    bool minus = false;
-    if (from > to) return 0;
-
-    if (str[from] == '-') minus = true;
-    if (str[from] == '-' || str[from] == '+') from++;
-
-    double num = 0.0;
-    double decimal = 1.0;
-
-    bool integer_part = true;
-    for (int i = from; i <= to; i++) {
-      if (isdigit(str[i]) && integer_part) {
-        num *= 10.0;
-        num += (str[i] - '0');
-      } else if (str[i] == '.') {
-        integer_part = false;
-      } else if (isdigit(str[i]) && !integer_part) {
-        decimal /= 10.0;
-        num += ((str[i] - '0') * decimal);
-      } else {
-        break;  // 그 이외의 이상한 문자들이 올 경우
-      }
-    }
-
-    if (minus) num *= -1.0;
-
-    return num;
-  }
-
-  Complex operator+(const Complex& a, const Complex& b) {
-    Complex temp(a.real_ + b.real_, a.img_ + b.img_);
-    return temp;
-  }
-
-  Complex operator-(const Complex& a, const Complex& b) {
-    Complex temp(a.real_ - b.real_, a.img_ - b.img_);
-    return temp;
-  }
-
-  Complex operator*(const Complex& a, const Complex& b) {
-    Complex temp(a.real_ * b.real_ - a.img_ * b.img_,
-        a.real_ * b.img_ + a.img_ * b.real_);
-    return temp;
-  }
-
-  Complex operator/(const Complex& a, const Complex& b) {
-    Complex temp(
-        (a.real_ * b.real_ + a.img_ * b.img_) /
-        (b.real_ * b.real_ + b.img_ * b.img_),
-        (a.img_ * b.real_ - a.real_ * b.img_) /
-        (b.real_ * b.real_ + b.img_ * b.img_));
-    return temp;
-  }
-
-  int main() {
-    Complex a(0, 0);
-    a = "-1.1 + i3.923" + a;
-    a = a + a;
-
-    Complex b(1, 2);
-    b = a + b;
-
-    b.println();
-  }
-  ```
-
-### 입출력 연산자 오버로딩
-* `std::cout << a;` 문장은 정확히 아래와 일치:
-  ```cpp
-  std::cout.operator<<(a);
-  ```
-* `std::cout`을 사용해 여러 형을 대상으로 출력할 수 있었던 이유는, `iostream` 헤더 파일 내에 아래와 같이 여러 형을 대상으로 연산자 오버로딩이 선언되어 있기 때문:
-  ```cpp
-  ostream& operator<<(bool val);
-  ostream& operator<<(short val);
-  ostream& operator<<(unsigned short val);
-  ostream& operator<<(int val);
-  ostream& operator<<(unsigned int val);
-  ostream& operator<<(long val);
-  ostream& operator<<(unsigned long val);
-  ostream& operator<<(float val);
-  ostream& operator<<(double val);
-  ostream& operator<<(long double val);
-  ostream& operator<<(void* val);
-  ```
-* 입출력 연산자 오버로딩은 레퍼런스를 반환해야 하며, 이유는 다음과 같은 문장을 올바르게 처리하기 위함:
-  ```cpp
-  std::cout << "a 의 값은 : " << a << " 이다. " << std::endl;
-  ```
-
-* `friend`를 사용한 입출력 연산자 오버로딩:
-  ```cpp
-  #include <iostream>
-  #include <cstring>
-
-  class Complex {
-  private:
-    double real_, img_;
-
-    double get_number(const char* str, int from, int to) const;
-
-  public:
-    Complex(double real, double img) : real_(real), img_(img) {}
-    Complex(const Complex& c) { real_ = c.real_, img_ = c.img_; }
-    Complex(const char* str);  // [NOLINT]
-
-    Complex& operator+=(const Complex& c);
-    Complex& operator-=(const Complex& c);
-    Complex& operator*=(const Complex& c);
-    Complex& operator/=(const Complex& c);
-
-    Complex& operator=(const Complex& c);
-
-    friend Complex operator+(const Complex& a, const Complex& b);
-    friend Complex operator-(const Complex& a, const Complex& b);
-    friend Complex operator*(const Complex& a, const Complex& b);
-    friend Complex operator/(const Complex& a, const Complex& b);
-    friend std::ostream& operator<<(std::ostream& os, const Complex& c);
-    friend std::istream& operator>>(std::istream& is, Complex& c);
-  };
-
-  Complex::Complex(const char* str) {
-    // 입력 받은 문자열을 분석하여 real 부분과 img 부분을 찾아야 한다.
-    // 문자열의 꼴은 다음과 같습니다 "[부호](실수부)(부호)i(허수부)"
-    // 이 때 맨 앞의 부호는 생략 가능합니다. (생략시 + 라 가정)
-
-    int begin = 0, end = strlen(str);
-    img_ = 0.0;
-    real_ = 0.0;
-
-    // 먼저 가장 기준이 되는 'i' 의 위치를 찾는다.
-    int pos_i = -1;
-    for (int i = 0; i != end; i++) {
-      if (str[i] == 'i') {
-        pos_i = i;
-        break;
-      }
-    }
-
-    // 만일 'i' 가 없다면 이 수는 실수 뿐이다.
-    if (pos_i == -1) {
-      real_ = get_number(str, begin, end - 1);
-      return;
-    }
-
-    // 만일 'i' 가 있다면,  실수부와 허수부를 나누어서 처리하면 된다.
-    real_ = get_number(str, begin, pos_i - 1);
-    img_ = get_number(str, pos_i + 1, end - 1);
-
-    if (pos_i >= 1 && str[pos_i - 1] == '-') img_ *= -1.0;
-  }
-  double Complex::get_number(const char* str, int from, int to) const {
-    bool minus = false;
-    if (from > to) return 0;
-
-    if (str[from] == '-') minus = true;
-    if (str[from] == '-' || str[from] == '+') from++;
-
-    double num = 0.0;
-    double decimal = 1.0;
-
-    bool integer_part = true;
-    for (int i = from; i <= to; i++) {
-      if (isdigit(str[i]) && integer_part) {
-        num *= 10.0;
-        num += (str[i] - '0');
-      } else if (str[i] == '.') {
-        integer_part = false;
-      } else if (isdigit(str[i]) && !integer_part) {
-        decimal /= 10.0;
-        num += ((str[i] - '0') * decimal);
-      } else {
-        break;  // 그 이외의 이상한 문자들이 올 경우
-      }
-    }
-
-    if (minus) num *= -1.0;
-
-    return num;
-  }
-
-  Complex& Complex::operator+=(const Complex& c) {
-    (*this) = (*this) + c;
-    return *this;
-  }
-
-  Complex& Complex::operator-=(const Complex& c) {
-    (*this) = (*this) - c;
-    return *this;
-  }
-
-  Complex& Complex::operator*=(const Complex& c) {
-    (*this) = (*this) * c;
-    return *this;
-  }
-
-  Complex& Complex::operator/=(const Complex& c) {
-    (*this) = (*this) / c;
-    return *this;
-  }
-
-  Complex& Complex::operator=(const Complex& c) {
-    real_ = c.real_;
-    img_ = c.img_;
-    return *this;
-  }
-
-  Complex operator+(const Complex& a, const Complex& b) {
-    Complex temp(a.real_ + b.real_, a.img_ + b.img_);
-    return temp;
-  }
-
-  Complex operator-(const Complex& a, const Complex& b) {
-    Complex temp(a.real_ - b.real_, a.img_ - b.img_);
-    return temp;
-  }
-
-  Complex operator*(const Complex& a, const Complex& b) {
-    Complex temp(a.real_ * b.real_ - a.img_ * b.img_,
-        a.real_ * b.img_ + a.img_ * b.real_);
-    return temp;
-  }
-
-  Complex operator/(const Complex& a, const Complex& b) {
-    Complex temp(
-        (a.real_ * b.real_ + a.img_ * b.img_) /
-        (b.real_ * b.real_ + b.img_ * b.img_),
-        (a.img_ * b.real_ - a.real_ * b.img_) /
-        (b.real_ * b.real_ + b.img_ * b.img_));
-    return temp;
-  }
-
-  std::ostream& operator<<(std::ostream& os, const Complex& c) {
-    os << "( " << c.real_ << " , " << c.img_ << " ) ";
-    return os;
-  }
-
-  std::istream& operator>>(std::istream& is, Complex& c) {
-    is >> c.real_ >> c.img_;
-    return is;
-  }
-
-  int main() {
-    Complex a(0, 0);
-    std::cin >> a;
-    a += a;
-
-    Complex b(1, 2);
-    b = a + b;
-    std::cout << b << std::endl;
-
-    return 0;
-  }
-
-  ```
-* `friend` 키워드를 사용하지 않는 방법:
-  ```cpp
-  #include <iostream>
-  #include <cstring>
-
-  class Complex {
-  private:
-    double real_, img_;
-
-    double get_number(const char* str, int from, int to) const;
-
-  public:
-    Complex(double real, double img) : real_(real), img_(img) {}
-    Complex(const Complex& c) { real_ = c.real_, img_ = c.img_; }
-    Complex(const char* str);  // [NOLINT]
-
-    // .... (생략) ....
-
-    std::ostream& print(std::ostream& os) const;
-    std::istream& input(std::istream& is);
-  };
-
-  // .... (생략) ....
-
-  std::ostream& Complex::print(std::ostream& os) const {
-    os << "( " << real_ << " , " << img_ << " ) ";
-    return os;
-  }
-  std::istream& Complex::input(std::istream& is) {
-    is >> real_ >> img_;
-    return is;
-  }
-
-  std::ostream& operator<<(std::ostream& os, const Complex& c) {
-    return c.print(os);
-  }
-  std::istream& operator>>(std::istream& is, Complex& c) {
-    return c.input(is);
-  }
-
-  ```
-
-### 첨자 연산자 오버로딩
-* 매개변수는 인덱스를 표현하기 위해 정수형을 사용하며, 반환형은 레퍼런스임:
-* 레퍼런스를 사용하는 이유는, 첨자 연산 결과를 좌측, 우측 양쪽에서 같이 사용할 수 있도록 하기 위함:
-  ```cpp
-  str[10] = 'c';
-  char c = str[5];
-  ```
-
-* 문자열의 첨자 연산자 오버로딩:
-  ```cpp
-  #include <iostream>
-  #include <string.h>  // [NOLINT]
-
-  class MyString {
-  public:
-    MyString(const MyString& m_str);  // [NOLINT]
-    MyString(const char* str);        // [NOLINT]
-    MyString(char c);                 // [NOLINT]
-    ~MyString(void);
-
-    int length(void) const;
-    void print(void) const;
-    void println(void) const;
-
-    char& operator[](const int index);
-
-  private:
-    char* content_;
-    int length_;
-    int capacity_;
-  };
-
-  MyString::MyString(const MyString& m_str) {
-    length_ = m_str.length_;
-    capacity_ = length_;
-    content_ = new char[length_];
-
-    // strcpy(content_,m_str.content_); not terminated with 'null' character
-    for (int i = 0; i < length_; ++i)
-      content_[i] = m_str.content_[i];
-  }
-
-  MyString::MyString(const char* str) {
-    length_ = strlen(str);
-    capacity_ = length_;
-    content_ = new char[length_];
-    strcpy(content_, str);  // [NOLINT]
-  }
-
-  MyString::MyString(char c) {
-    length_ = 1;
-    capacity_ = length_;
-    content_ = new char[length_];
-    *content_ = c;
-  }
-
-  MyString::~MyString(void) {
-    delete[] content_;
-  }
-
-  int MyString::length(void) const {
-    return length_;
-  }
-
-  void MyString::print(void) const {
-    for (int i = 0; i < length_; ++i)
-      std::cout << content_[i];
-  }
-
-  void MyString::println(void) const {
-    print();
-    std::cout << std::endl;
-  }
-
-  char& MyString::operator[](const int index) { 
-    return content_[index];
-  }
-
-  int main() {
-    MyString str{"Hello, world!"};
-    str[7] = 'W';
-    str.println();
-
-    return 0;
-  }
-
-  ```
-
-### 타입 변환 연산자 오버로딩
-* 기본 자료형을 객체로써 사용해야 할 경우, 이를 클래스로 포장해서 각각의 자료형을 객체로 사용해야 함
-* 기본 자료형을 객체로써 사용할 수 있도록 하는 클래스를 wrapper 클래스라 함:
-  ```cpp
-  class Int
-  {
-    int data_;
-    // some other data
-
-   public:
-    Int(int data) : data_(data) {}
-    Int(const Int& i) : data_(i.data) {}
-  };
-
-  ```
-  * `Int`를 `int`처럼 사용하려면 연산자 오버로딩을 <b>직접, 일일이</b> 구현해야 할까?
-
-* 타입 변환 연산자는 다음과 같이 정의:
-  ```cpp
-  operator (TYPE)()
-  ```
-  * 생성자 혹은 소멸자처럼 반환형을 사용하지 않음
-
-  ```cpp
-  operator (int)()
-  ```
-  * 객체를 `int` 형으로써 간주
-
-  ```cpp
-  operator int() { return data; }
-  ```
-  * 객체를 대상으로 `읽는` 연산을 할 경우, `data`를 `int`형으로 변환 후 반환
-  * 객체를 대상으로 `댕립` 연산을 할 경우, 디폴트 대입 연산자가 타입 변환 연산자를 참고해 적절히 변환 후 처리
-
-* `Int` wrapper 클래스에 타입 변환 연산자를 사용:
-  ```cpp
-  #include <iostream>
-
-  class Int {
-    int data;
-    // some other data
-
-  public:
-    Int(int data) : data(data) {}
-    Int(const Int& i) : data(i.data) {}
-
-    operator int() { return data; }
-  };
-  int main() {
-    Int x = 3;
-    int a = x + 4;
-
-    x = a * 2 + x + 4;
-    std::cout << x << std::endl;
-  }
-  ```
-
-* 여러 개의 타입 변환 연산자:
-  ```cpp
-  #include <iostream>
-
-  class Test {
-  private:
-    char c_;
-    int i_;
-    double d_;
-
-  public:
-    Test(char c, int i, double d) : c_(c), i_(i), d_(d) { }
-    operator char() const;
-    operator int() const;
-    operator double() const;
-  };
-
-  Test::operator char() const {
-    std::cout << "operator char()" << std::endl;
-    return c_;
-  }
-
-  Test::operator int() const {
-    std::cout << "operator int()" << std::endl;
-    return i_;
-  }
-
-  Test::operator double() const {
-    std::cout << "operator double()" << std::endl;
-    return d_;
-  }
-
-  int main() {
-    Test test('x', 16, 3.14);
-    char c = test;
-    int i = test;
-    double d = test;
-
-    std::cout << c << ' ' << i << ' ' << d << std::endl;
-
-    return 0;
-  }
-
-  ```
-
-### 증감 연산자 오버로딩
-* 전위 증감 연산자와 후위 증감 연산자는 매개변수 형태에 따라 구분:
-  ```cpp
-  operator++();       // 전위 증가
-  operator--();       // 전위 감소
-  operator++(int x);  // 후위 증가
-  operator--(int x);  // 후위 감소
-  ```
-* <b>전위 증감 연산자의 반환형은 자기 자신의 레퍼런스, 후위 증감 연산자의 반환형은 값이 바뀌기 전의 객체를 반환해야 함</b>:
-  ```cpp
-  #include <iostream>
-
-  class Test {
-    int data_;
-
-  public:
-    Test(int data) : data_(data) {}  // [NOLINT]
-    Test(const Test& t) : data_(t.data_) {}
-
-    Test& operator++() {
-      data_++;
-      std::cout << "전위 증감 연산자" << std::endl;
-      return *this;
-    }
-
-    // 전위 증감과 후위 증감에 차이를 두기 위해 후위 증감의 경우 인자로 int 를
-    // 받지만 실제로는 아무것도 전달되지 않는다.
-    Test operator++(int) {
-      Test temp(*this);
-      data_++;
-      std::cout << "후위 증감 연산자" << std::endl;
-      return temp;
-    }
-
-    int get_x() const {
-      return data_;
-    }
-  };
-
-  void func(const Test& t) {
-    std::cout << "x : " << t.get_x() << std::endl;
-  }
-
-  int main() {
-    Test t(3);
-
-    func(++t);  // 4
-    func(t++);  // 4 가 출력됨
-    std::cout << "x : " << t.get_x() << std::endl;
-  }
-
-  ```
-
-### [What are the basic rules and idioms for operator overloading?](https://stackoverflow.com/questions/4421706/what-are-the-basic-rules-and-idioms-for-operator-overloading)
-
-###### [처음으로](#c-tutorial)
-###### [뒤로가기](/tutorial/#index)
+math: mathjax
 ---
+
+# 제네릭 프로그래밍 (Generic Programming: Templates)
+
+## 함수 템플릿 (Function Template)
+
+* 함수 내 일부 형을 컴파일 시점에 확정하는 기법
+
+```cpp
+template <typename T, typename U, ..., typename Z>
+T function_template_syntax(U first, ... Z last) {
+  // do something ...
+}
+```
+
+* 함수 템플릿을 위한 템플릿 헤더 (template header)는 `template` 키워드를 사용
+* 템플릿 헤더의 내용은 `<>` 괄호를 사용하며, **제네릭 형 (generic type)** 표현에 사용됨
+* `T`, `U`, `Z`는 컴파일 시점에 확정되는 형의 자리 표시자 (placeholder)
+* 하나의 함수 템플릿은 여러 번 호출되어 여러 개의 함수 정의가 생성될 수 있음
+  * 함수 템플릿은 호출 시점의 전달 인자와 반환 형을 바탕으로 적합한 형이 컴파일 시점에 결정됨
+* 함수 템플릿을 사용한 프로그래밍을 다음과 같이 표현함
+  * 제네릭 프로그래밍 (generic programming)
+  * 템플릿 프로그래밍 (template programming)
+
+---
+
+### Using One Function Template
+
+```cpp
+#include <iostream>
+
+// Definition of a template function
+template <typename T>
+T Smaller(const T& op1, const T& op2) { return op1 < op2 ? op1 : op2; }
+
+int main() {
+  std::cout << "Smaller of 'a' and 'b': " << Smaller('a', 'b') << std::endl;
+  std::cout << "Smaller of 12 and 15: " << Smaller(12, 15) << std::endl;
+  std::cout << "Smaller of 44.2 and 33.1: " << Smaller(44.2, 33.1) << std::endl;
+  return 0;
+}
+```
+
+---
+
+### 함수 템플릿과 함수 오버로딩 간 비교
+
+```cpp
+// Function to find the smaller between two characters
+char smaller(char op1, char op2)  { return op1 < op2 ? op1 : op2; }
+
+// Function to find the smaller between two integers
+int smaller(int op1, int op2)  { return op1 < op2 ? op1 : op2; }
+
+// Function to find the smaller between two doubles
+double smaller(double op1, double op2)  { return op1 < op2 ? op1 : op2; }
+```
+
+* 함수 템플릿 `Smaller`는 간단한 형태이므로 함수 오버로딩을 통해 동일한 동작 수행 가능
+* 함수 템플릿은 호출 형태에 따라 컴파일 시점에 제네릭 형을 확정한 함수 코드가 생성됨
+* 함수 오버로딩은 컴파일 전에 호출될 형태를 파악하여 필요한 만큼 코드로 직접 구현해야 함
+
+---
+
+### Swapping Two Values
+
+```cpp
+#include <iostream>
+
+// Definition of template function
+template <typename T>
+void Exchange(T* op1, T* op2) {
+  T temp = *op1;
+  *op1 = *op2;
+  *op2 = temp;
+}
+
+int main() {
+  int i1 = 5;
+  int i2 = 70;
+  Exchange(&i1, &i2);  // Swapping two int types
+  std::cout << "After swapping 5 and 70: " << i1 << " " << i2 << std::endl;
+  double d1 = 1.2;
+  double d2 = 3.4;
+  Exchange(&d1, &d2);  // Swapping two double types
+  std::cout << "After swapping 1.2 and 3.4: " << d1 << " " << d2 << std::endl;
+  return 0;
+}
+```
+
+---
+
+## 템플릿 인스턴스화 (Template Instantiation)
+
+![center](Figure_15_1.png)
+
+* 함수 템플릿으로부터 컴파일 시점에 형이 확정되어 실제로 실행 가능한 함수가 생성되는 것
+* 함수 템플릿은 **실제로 사용할 수 없는 코드**
+  * 컴파일 시점에 필요한 형태의 함수를 만들기 위해 존재하는 일종의 틀
+* 컴파일 시점에 함수 템플릿을 사용하는 형태에 맞게 동작할 수 있는 함수를 생성
+* 함수 템플릿으로부터 함수 코드를 생성하는 행위를 **인스턴스화**라고 함
+  * 클래스로부터 객체를 생성하는 인스턴스화와 용어는 같지만 다른 의미임에 유의
+
+---
+
+## 함수 템플릿의 변형 (Variations)
+
+* 기본 함수 템플릿 문법으로부터 변형된 몇 가지 형태들
+
+### 자료형이 아닌 템플릿 매개변수 (Non-type Template Parameter)
+
+* 함수 템플릿에 제네릭 형 뿐만 아니라 값을 정의할 수도 있음
+* 값을 정의하고자 할 경우 해당 값의 형을 **명시적으로 표현해야 함**
+* 값으로 사용 가능한 형 ([Template parameters and template arguments](https://en.cppreference.com/w/cpp/language/template_parameters)):
+  * 정수 형 (`int`, `long`, `size_t`, etc.)
+  * 포인터 또는 참조
+  * 열거형
+  * `nullptr`
+* 값으로 사용 가능한 형이 제한적인 이유는 컴파일 시점에 값이 확정되는 형태만을 사용할 수 있음
+* **부동소수점 자료형이 허용되지 않음에 유의**
+  * 부동소수점 표현은 컴파일러에 따라 값이 다르게 표현될 수 있음
+  * 부동소수점 표현은 정밀도 제약이 존재해 값이 매번 다르게 표현될 수 있음
+    * `0.1f == 0.1f` 표현은 항상 같다고 평가되지 않음
+  * 함수 템플릿에 사용되는 값은 어떠한 상황에서도 항상 같은 값을 표현해야 함
+
+---
+
+#### Printing an Array - 1st Version
+
+```cpp
+#include <iostream>
+
+// Definition of the print template function
+template <typename T, int n>
+void print(T (&array)[n]) {
+  for (int i = 0; i < n; ++i) std::cout << array[i] << " ";
+  std::cout << std::endl;
+}
+
+int main() {
+  // Creation of two arrays
+  int arr1[4] = {7, 3, 5, 1};
+  double arr2[3] = {7.5, 6.1, 4.6};
+  // Calling template function
+  print(arr1);
+  print(arr2);
+  return 0;
+}
+```
+
+---
+
+### 템플릿에서의 기본 매개변수 (Default Arguments for Template Parameters)
+
+* 함수의 매개변수에 기본 값을 설정하듯 템플릿에도 사용 가능
+  * 형 또는 형이 아닌 값을 설정할 수 있음
+
+```cpp
+// Default argument for type template parameters
+template <typename T1, typename T2 = int>
+
+// Default argument for non-type template parameters
+template <typename T, int n, int step = 1>
+```
+
+* 기본 매개변수 자리에 명시적으로 값을 전달해 기본 매개변수 대신 명시적인 값을 사용할 수 있음
+* 기본 매개변수는 오른쪽부터 채워져야 함
+* 기본 매개변수를 형이 아닌 값으로 사용할 경우 아래와 같은 형이여야 함:
+  * 정수 형 (`int`, `long`, `size_t`, etc.)
+  * 포인터 또는 참조
+  * 열거형
+  * `nullptr`
+
+---
+
+#### Printing an Array - 2nd Version
+
+```cpp
+#include <iostream>
+
+// Definition of the print template function with a default parameter
+template <typename T, int n, int step = 1>
+void print(T (&array)[n]) {
+  for (int i = 0; i < n; i += step) std::cout << array[i] << " ";
+  std::cout << std::endl;
+}
+
+int main() {
+  // Creation of two arrays
+  int arr1[4] = {7, 3, 5, 1};
+  double arr2[3] = {7.5, 6.1, 4.6};
+
+  // Calling the template function with and without the default parameter
+  print(arr1);                 // Uses the default step = 1
+  print<arr2[0], 3, 2>(arr2);  // Specifies step = 2 explicitly
+
+  return 0;
+}
+```
+
+---
+
+### 명시적 자료형 결정 (Explicit Type Determination)
+
+```cpp
+// Definition of a template function
+template <typename T>
+T Smaller(const T& op1, const T& op2) { return op1 < op2 ? op1 : op2; }
+```
+
+```cpp
+Smaller(12.34, 15);
+```
+
+* 이 경우는 함수 템플릿에서 하나의 제네릭 형을 사용했지만, 전달인자의 두 형이 서로 다름
+* 제네릭 형을 다음과 같이 명시적으로 사용하면 위 문제를 해결할 수 있음
+
+```cpp
+Smaller<double>(12.34, 15);
+```
+
+* 함수 템플릿 호출 시 이름과 전달인자 사이에 제네릭 형을 결정할 수 있음
+  * `double`로 제네릭 형을 이미 결정했으므로, 함수 템플릿 `T`는 `double`
+  * `15`는 실제로 매개변수로의 복사 시 `15.0`으로 암묵적 형 변환 발생
+
+---
+
+### 미리 정의된 연산 (Predefined Operation)
+
+```cpp
+// Definition of a template function
+template <typename T>
+T Smaller(const T& op1, const T& op2) { return op1 < op2 ? op1 : op2; }
+```
+
+* `Smaller(100, 200)` 또는 `Smaller(12.3, 45.6)` 등의 호출은 사용 시 문제가 없음
+  * 기본 자료형에 대해 비교 연산이 이미 **컴파일러 내부에 정의**되어 있음
+* 만약 사용자 정의 형 객체를 함수 템플릿 `Smaller`에 전달할 경우 문제가 생길 수 있음:
+  * 사용자 정의 형 클래스가 작음 비교 연산자 (`<`, less than operator)를 재정의한 경우:
+
+  ```cpp
+  Smaller(std::string("hello"), std::string("bye"));  // bye
+  ```
+
+  * 만약 작음 비교 연산자가 구현되어 있지 않다면, **컴파일 시 오류 발생**
+
+  ```cpp
+  Smaller("hello", "bye");  // const char* has no '<' implementation
+  ```
+
+---
+
+### 특수화 (Specialization)
+
+```cpp
+// Definition of a template function
+template <typename T>
+T Smaller(const T& op1, const T& op2) { return op1 < op2 ? op1 : op2; }
+
+#include <cstring>
+
+// specialization
+template <>
+const char* Smallest(const char* op1, const char* op2) {
+  return std::strcmp(op1, op2) < 0 ? op1 : op2;
+}
+```
+
+* 존재하는 함수 템플릿에 대해 예외 상황을 추가하여 특수화할 수 있음
+* 특수화를 의미하는 템플릿 헤더는 `template <>`
+* 함수 템플릿으로부터 특정 타입을 위한 **독립된 함수를 정의**
+  * 함수 템플릿은 완성된 함수가 아닌 일종의 틀인 반면, 특수화된 함수는 완성된 함수임
+* 위 예시는 작음 비교 연산자가 없는 경우를 특수화하여 컴파일 오류를 해결한 형태
+
+---
+
+### 오버로딩 (Overloading)
+
+* 함수 템플릿에 오버로딩을 적용하면 가변 길이의 전달인자를 효율적으로 다룰 수 있음
+
+#### The Program for Overloaded `Smaller` Function
+
+```cpp
+#include <iostream>
+
+// Definition of a template function
+template <typename T>
+T Smallest(const T& op1, const T& op2) { return op1 < op2 ? op1 : op2; }
+
+// Template function with three parameters
+// Note that we have defined the second function in terms of the first one.
+// That is the reason the second function is shorter.
+template <typename T>
+T Smallest(const T& op1, const T& op2, const T& op3) {
+  return Smallest(Smallest(op1, op2), op3);
+}
+
+int main() {
+  // Calling the overloaded version with three integers
+  std::cout << "Smallest of 17, 12, and 27 is ";
+  std::cout << Smallest(17, 12, 27) << std::endl;
+  return 0;
+}
+```
+
+---
+
+## 함수 템플릿을 사용하는 경우에서의 파일 분할
+
+* **함수 템플릿은 인터페이스로 작성하는 것이 원칙**
+  * 헤더 파일 내에 함수 템플릿 구현을 작성
+  * **함수 템플릿은 선언과 구현을 분리하지 않음**
+* 함수 템플릿의 선언과 구현을 분리할 경우:
+  * foo.hpp, foo.cc, app.cc 세 개의 파일을 분할 컴파일한다고 가정
+    * foo.hpp에는 함수 템플릿의 선언, foo.cc에는 함수 템플릿의 구현이 각각 담겨 있음
+    * app.cc는 foo.hpp를 사용해 함수 템플릿을 사용하는 형태
+  * 컴파일러가 app.cc를 먼저 컴파일할 경우, 함수 템플릿 선언만 존재하므로 인스턴스화 불가
+    * 빌드 시 컴파일 의존관계를 고려해야 함
+    * foo.cc를 먼저 컴파일해 목적파일을 생성한 뒤, 이를 app.cc 컴파일에 같이 사용해야 함
+
+---
+
+### Definition of a Function Template
+
+* smaller.hpp
+
+```cpp
+#pragma once
+
+// Definition of a template function
+template <typename T>
+T Smaller(const T& op1, const T& op2) {
+  return op1 < op2 ? op1 : op2;
+}
+```
+
+* main.cc
+
+```cpp
+#include <iostream>
+
+#include "smaller.hpp"
+
+int main() {
+  std::cout << "Smaller of 'a' and 'b': " << Smaller('a', 'b') << std::endl;
+  std::cout << "Smaller of 12 and 15: " << Smaller(12, 15) << std::endl;
+  std::cout << "Smaller of 44.2 and 33.1: " << Smaller(44.2, 33.1) << std::endl;
+  return 0;
+}
+```
+
+---
+
+## 클래스 템플릿 (Class Template)
+
+```cpp
+template <typename T>
+class Name {
+  T data;
+
+ public:
+  T get() const;            // accessor 
+  void set(const T& data);  // mutator function
+};
+
+// Implementation of the get function
+template <typename T>
+T Name<T>::get() const { return data; }
+
+// Implementation of the set function
+template <typename T>
+void Name<T>::set(const T& d) { data = d; }
+```
+
+* 기존 클래스 설계에 함수 템플릿 기능을 추가한 클래스
+* 제네릭 형을 사용해 여러 형태의 클래스 인스턴스화 가능
+  * 대표적인 클래스 템플릿으로는 표준 C++ 문자열 클래스가 있음
+* 클래스 템플릿은 함수 템플릿과 마찬가지로 **인터페이스**로 사용할 것을 권장
+  * 헤더파일 안에 클래스 템플릿의 선언과 구현이 같이 존재해야 함
+
+---
+
+### 클래스 템플릿 분할 컴파일 1 - 명시적 인스턴스화 (Explicit Instantiation)
+
+* 클래스 템플릿을 인터페이스로 사용하지 않고, 선언과 구현을 분리하는 방법
+* 미리 클래스 템플릿에 적용될 수 있는 형을 코드에 명시적으로 표현
+  * 미리 인스턴스화할 형을 지정함에 따라 컴파일 속도 개선 효과가 있음
+* 선언과 분리가 반드시 분리되어야 할 경우 사용할 수 있는 방법
+  * 클래스 템플릿을 인터페이스로 외부에 공개해야 하지만 세부 구현은 감추고 싶은 경우
+* 다양한 형을 지원해야 하는 상황이라면 명시적으로 지원해야 하는 모든 형을 표현해야 함
+  * 관리 측면에서 번거로울 수 있음
+* 컴파일 시 **의존성 관리**를 해주어야 함
+  * 반드시 클래스 템플릿을 먼저 컴파일된 후에 이를 컴파일 과정에 포함하도록 구성해야 함
+  * Makefile 또는 CMake 등을 활용할 수 있음
+
+  ```shell
+  g++ -c fun.cc -o fun.o && g++ main.cc fun.o -o run
+  ```
+
+---
+
+* fun.hpp
+
+```cpp
+#pragma once
+
+template <typename T>
+class Fun {
+  T data_;
+
+ public:
+  explicit Fun(const T& data);
+  ~Fun() = default;
+
+  T get() const;
+  void set(const T& data);
+};
+```
+
+---
+
+* fun.cc
+
+```cpp
+#include "fun.hpp"
+
+#include <string>
+
+// Constructor
+template <typename T>
+Fun<T>::Fun(const T& d) : data_(d) {}
+
+// Accessor Function
+template <typename T>
+T Fun<T>::get() const {
+  return data_;
+}
+
+// Mutator Function
+template <typename T>
+void Fun<T>::set(const T& d) {
+  data_ = d;
+}
+
+// Explicit instantiation
+template class Fun<int>;
+template class Fun<double>;
+template class Fun<char>;
+template class Fun<std::string>;
+```
+
+---
+
+* main.cc
+
+```cpp
+#include <iostream>
+#include <string>
+
+#include "fun.hpp"
+
+int main() {
+  Fun<int> fun1(23);
+  Fun<double> fun2(12.7);
+  Fun<char> fun3('A');
+  Fun<std::string> fun4("Hello");
+
+  // undefined reference to `Fun<float>::Fun(float const&)'
+  // Fun<float> fun5(123.4f);  // there's no explicit instantiation for float
+
+  std::cout << "fun1: " << fun1.get() << std::endl;
+  std::cout << "fun2: " << fun2.get() << std::endl;
+  std::cout << "fun3: " << fun3.get() << std::endl;
+  std::cout << "fun4: " << fun4.get() << std::endl;
+
+  fun1.set(47);
+  std::cout << "fun1 after set: " << fun1.get() << std::endl;
+  fun3.set('B');
+  std::cout << "fun3 after set: " << fun3.get() << std::endl;
+  return 0;
+}
+```
+
+---
+
+### 클래스 템플릿 분할 컴파일 2 - 인터페이스
+
+* 헤더 파일에 클래스 템플릿의 선언과 구현을 같이 작성하는 방법
+* **컴파일 의존관계를 고려하지 않아도 됨**
+* 어떠한 형을 사용하더라도 인스턴스화가 가능함
+* 컴파일 시간은 명시적 인스턴스화를 사용하는 방법보다 길어질 수 있음
+* 인터페이스가 외부에 공개되어야 한다면 클래스 템플릿의 세부 구현이 노출될 수 있음
+
+---
+
+* fun.hpp
+
+```cpp
+#pragma once
+
+#include <string>
+
+template <typename T>
+class Fun {
+  T data_;
+
+ public:
+  explicit Fun(const T& data);
+  ~Fun() = default;
+
+  T get() const;
+  void set(const T& data);
+};
+
+// Constructor
+template <typename T>
+Fun<T>::Fun(const T& d) : data_(d) {}
+
+// Accessor Function
+template <typename T>
+T Fun<T>::get() const {
+  return data_;
+}
+
+// Mutator Function
+template <typename T>
+void Fun<T>::set(const T& d) {
+  data_ = d;
+}
+```
+
+---
+
+* main.cc
+
+```cpp
+#include <iostream>
+#include <string>
+
+#include "fun.hpp"
+
+int main() {
+  Fun<int> fun1(23);
+  Fun<double> fun2(12.7);
+  Fun<char> fun3('A');
+  Fun<std::string> fun4("Hello");
+
+  // An interface file can create an instance corresponding to any type it is
+  // given.
+  Fun<float> fun5(123.4f);
+
+  std::cout << "fun1: " << fun1.get() << std::endl;
+  std::cout << "fun2: " << fun2.get() << std::endl;
+  std::cout << "fun3: " << fun3.get() << std::endl;
+  std::cout << "fun4: " << fun4.get() << std::endl;
+
+  fun1.set(47);
+  std::cout << "fun1 after set: " << fun1.get() << std::endl;
+  fun3.set('B');
+  std::cout << "fun3 after set: " << fun3.get() << std::endl;
+  return 0;
+}
+```
+
+---
+
+### 어떤 방법을 사용해야 하는가?
+
+* 외부 공개용 인터페이스 내에 클래스 템플릿을 사용하는 경우는 **거의 없음**
+* 대부분의 클래스 템플릿은 내부적으로 사용하는 경우가 대부분
+* **클래스 템플릿은 인터페이스로 작성하는 것이 일반적**
+* 외부에 공개할 인터페이스 안에 클래스 템플릿을 사용한 경우:
+  1. 명시적 인터페이스를 사용한 뒤, 이를 사용하는 방법 (컴파일 의존관계) 설명을 부연하여 외부에 공개한다.
+  2. **외부에 공개할 인터페이스를 수정하여 클래스 템플릿을 사용하지 않는 방향으로 코드를 재작성한다.**
+
+---
+
+### 클래스 템플릿을 사용한 스택 클래스 구현
+
+* 제네릭 형을 사용해 범용적인 스택 클래스 구현
+
+![center](Figure_15_4.png)
+
+---
+
+* stack_exception.hpp
+
+```cpp
+#pragma once
+
+#include <exception>
+#include <string>
+
+class StackException : public std::exception {
+ public:
+  StackException(const std::string& what, const std::string& where) noexcept
+      : what_(what), where_(where) {}
+  ~StackException() noexcept override = default;
+
+  const char* what() const noexcept override { return what_.c_str(); }
+  const char* where() const noexcept { return where_.c_str(); }
+
+ private:
+  const std::string what_;
+  const std::string where_;
+};
+```
+
+---
+
+* stack.hpp
+
+```cpp
+#pragma once
+
+#include <iostream>
+#include "stack_exception.hpp"
+
+template <typename T>
+class Stack {
+ public:
+  explicit Stack(int capacity) : capacity_(capacity), size_(0) {
+    ptr_ = new T[capacity_];
+  }
+
+  ~Stack() { delete[] ptr_; }
+
+  void push(const T& elem) {
+    if (size_ >= capacity_)
+      throw StackException("Stack is full", "Stack::push");
+    ptr_[size_++] = elem;
+  }
+
+  T pop() {
+    if (size_ <= 0) throw StackException("Stack is empty", "Stack::pop");
+    return ptr_[--size_];
+  }
+
+ private:
+  T* ptr_;
+  int capacity_;
+  int size_;
+};
+```
+
+---
+
+* main.cc
+
+```cpp
+#include <iostream>
+
+#include "stack.hpp"
+
+int main() {
+  try {
+    Stack<int> stack(3);
+    stack.push(10);
+    stack.push(20);
+    stack.push(30);
+
+    // Uncommenting this line will throw an exception
+    // stack.push(40);
+
+    std::cout << "Popped: " << stack.pop() << std::endl;
+    std::cout << "Popped: " << stack.pop() << std::endl;
+    std::cout << "Popped: " << stack.pop() << std::endl;
+
+    // Uncommenting this line will throw an exception
+    // std::cout << "Popped: " << stack.pop() << std::endl;
+
+  } catch (const StackException& e) {
+    std::cerr << "Exception occurred: " << e.what()
+              << ", Location: " << e.where() << std::endl;
+  }
+
+  return 0;
+}
+```
+
+---
+
+## 템플릿과 관련한 기타 문제 (Other Issues)
+
+### `friend`
+
+* 클래스 템플릿은 일반 함수, 함수 템플릿, 특수화된 함수 템플릿을 `friend`로 가질 수 있음
+
+```cpp
+#include <iostream>
+
+// Function declarations
+void NonTemplateFunction();
+
+template <typename T>
+void TemplateFunction(T value);
+
+// specialization for int
+template <>
+void TemplateFunction<int>(int value);
+
+template <typename T>
+class MyClass {
+  T value_;  // Internal value of the class
+
+ public:
+  explicit MyClass(T value) : value_(value) {}
+
+  // Declare friend functions
+  friend void NonTemplateFunction();
+  template <typename U>
+  friend void TemplateFunction(U value);
+  friend void TemplateFunction<int>(int value);
+};
+```
+
+---
+
+### 별칭 (Aliases)
+
+* 템플릿은 코드가 길어짐에 따라 가독성이 낮아질 수 있음
+* 별칭 (`using`)을 사용해 코드의 길이를 줄이거나 더욱 명료한 표현을 통해 가독성을 높일 수 있음
+
+```cpp
+// This allows us to use the alias as the full definition of the class in the
+// code (program):
+using IntStack = Stack<int>;
+using DoubleStack = Stack<double>;
+using StringStack = Stack<std::string>;
+
+// Then we can use the type definitions in our program as shown below:
+IntStack s1;
+DoubleStack s2;
+StringStack s3;
+```
+
+```cpp
+template<typename T>
+using Ptr = T*;  // Using 'using' to define a pointer alias in a concise way
+
+int x = 42;
+Ptr<int> intPointer = &x;  // Using the Ptr alias to declare an int pointer
+```
+
+---
+
+### 상속 (Inheritance)
+
+* 클래스 템플릿 또는 일반 클래스를 기반으로 사용해 새로운 클래스 템플릿을 파생할 수 있음
+
+```cpp
+template <typename T>
+class BaseTemplate {
+  T value_
+
+ public:
+  BaseTemplate(T val) : value_(val) {}
+};
+
+template <typename T>
+class DerivedTemplate : public BaseTemplate<T> {
+ public:
+  DerivedTemplate(T val) : BaseTemplate<T>(val) {}
+};
+```
+
+```cpp
+class NonTemplateClass {
+  int value_
+
+ public:
+  NonTemplateClass(int val) : value_(val) {}
+};
+
+template <typename T>
+class DerivedFromNonTemplate : public NonTemplateClass {
+ public:
+  DerivedFromNonTemplate(T val) : NonTemplateClass(val) {}
+};
+```
+
+---
+
+### 이전에 학습했던 클래스 (in Retrospect)
+
+* 이전에 학습한 클래스 중 일부는 **클래스 템플릿**
+
+#### C++ 문자열 클래스
+
+* 클래스 템플릿을 [`std::basic_string`](https://en.cppreference.com/w/cpp/string/basic_string) 형으로 특수화한 것
+
+```cpp
+template <typename CharT,
+          typename Traits = std::char_traits<CharT>,
+          typename Allocator = std::allocator<CharT>>
+class basic_string;
+```
+
+* `CharT`
+  * 문자열 구성에 사용하는 개별 문자 형
+  * C++ 문자열은 제네릭 형 `CharT`를 `char` 형으로 특수화한 것
+* `Traits`
+  * 문자열 연산 방법을 정의하는 클래스
+  * `Traits` 형은 기본 형이 지정되어 있으며, 필요에 따라 변경해 사용 가능
+* `Allocator`
+  * 메모리 관리 방법을 정의하는 클래스
+  * `Allocator` 형은 기본 형이 지정되어 있으며, 필요에 따라 변경해 사용 가능
+
+---
+
+* my_char_traits.hpp
+
+```cpp
+#pragma once
+
+#include <cctype>
+#include <iostream>
+#include <string>
+
+// Custom char_traits implementation to get case-insentive comparison
+class MyCharTraits : public std::char_traits<char> {
+  // std::char_traits requires specific method names like `lt` and `compare` for
+  // STL compatibility. These methods are static to allow direct access without
+  // instantiating the class. Changing method names breaks the contract and
+  // causes the standard library to fail.
+
+ public:
+  static int MyRank(char c) noexcept { return std::tolower(c); }
+
+  static bool lt(const char c1, const char c2) noexcept {
+    return MyRank(c1) < MyRank(c2);
+  }
+  static int compare(const char* s1, const char* s2, size_t n) noexcept {
+    while (n--) {
+      if (MyRank(*s1) < MyRank(*s2)) return -1;
+      if (MyRank(*s1) > MyRank(*s2)) return 1;
+      ++s1;
+      ++s2;
+    }
+    return 0;
+  }
+};
+```
+
+---
+
+* main.cc
+
+```cpp
+#include <iostream>
+
+#include "my_char_traits.hpp"
+
+int main() {
+  // Using MyCharTraits with basic_string
+  std::basic_string<char, MyCharTraits> my_s1 = "ABcd";
+  std::basic_string<char, MyCharTraits> my_s2 = "abCD";
+  std::cout << "MyCharTraits: " << std::boolalpha << (my_s1 == my_s2)
+            << std::endl;
+
+  // Using std::string for comparison
+  std::string s1 = "ABcd";
+  std::string s2 = "abCD";
+  std::cout << "C++ string: " << std::boolalpha << (s1 == s2) << std::endl;
+
+  return 0;
+}
+```
+
+---
+
+#### 입출력 클래스
+
+* [`std::basic_istream`](https://en.cppreference.com/w/cpp/io/basic_istream), [`std::basic_ostream`](https://en.cppreference.com/w/cpp/io/basic_ostream) 클래스 템플릿을 특수화한 것
+
+```cpp
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+class basic_istream;
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+class basic_ostream;
+```
+
+* `std::cin` 객체와 `std::cout` 객체는 `CharT` 형을 `char`형으로 특수화하여 생성한 객체
+
+```cpp
+using std::istream = std::basic_istream<char>;
+using std::ostream = std::basic_ostream<char>;
+```
