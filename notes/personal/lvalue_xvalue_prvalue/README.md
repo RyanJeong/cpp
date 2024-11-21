@@ -1,3 +1,4 @@
+## glvalue, lvalue, xvalue, prvalue, rvalue
 ### **1. 값 범주 정의와 메모리**
 #### **값 범주의 분류**
 1. **glvalue** (generalized lvalue):
@@ -129,3 +130,118 @@ rref2 (xvalue reflects x): 100
 
 5. **xvalue의 "expiring" 의미**
    - xvalue는 소멸 가능한 상태를 나타내지만, 실제 소멸은 스코프 종료 시점에 이루어짐.
+
+---
+
+## `std::move(x)`와 xvalue
+
+### **1. `std::move(x)`의 동작**
+- **`std::move`의 본질**: 
+  - `std::move(x)`는 단순히 `x`를 rvalue로 캐스팅하여 **xvalue**로 평가되도록 만듭니다.
+  - `std::move`는 `std::remove_reference<T>::type&&` 형태의 rvalue 참조를 반환합니다.
+  - 이때 **`x` 자체는 여전히 lvalue입니다.**
+
+#### **코드 분석**
+```cpp
+#include <iostream>
+#include <type_traits>
+
+int main() {
+    int x = 42;                      // x는 lvalue
+    std::cout << std::is_lvalue_reference<decltype(x)>::value << std::endl;  // true
+    std::cout << std::is_rvalue_reference<decltype(x)>::value << std::endl;  // false
+
+    int&& r = std::move(x);          // std::move(x)는 xvalue로 평가
+    std::cout << std::is_lvalue_reference<decltype(std::move(x))>::value << std::endl;  // false
+    std::cout << std::is_rvalue_reference<decltype(std::move(x))>::value << std::endl;  // true
+
+    return 0;
+}
+```
+
+#### **출력**
+```
+1  // x는 lvalue
+0  // x는 rvalue가 아님
+0  // std::move(x)는 lvalue가 아님
+1  // std::move(x)는 rvalue (xvalue)
+```
+
+#### **분석**
+1. `x`는 여전히 lvalue입니다. `std::move`는 `x` 자체의 값 범주를 변경하지 않습니다.
+2. `std::move(x)`는 `x`를 rvalue로 캐스팅하고, 이 캐스팅된 결과가 **xvalue**로 평가됩니다.
+3. **결론적으로, `std::move`는 `x` 자체의 본질(lvalue)을 변경하지 않고, rvalue로 사용할 수 있도록 "표현(expression)"을 변경하는 역할만 합니다.**
+
+---
+
+### **2. `std::move`와 값 범주의 관계**
+#### **lvalue에서 xvalue로의 변환이 아님**
+- `std::move`는 lvalue인 `x`를 **xvalue로 바꿔버리는 것이 아니라**, lvalue를 rvalue로 캐스팅한 표현을 반환합니다.
+- 캐스팅된 표현식인 `std::move(x)`는 **xvalue로 평가**됩니다.
+
+#### **xvalue와 lvalue의 차이**
+- **lvalue**: 이름을 가지며 지속적으로 참조 가능한 객체.
+- **xvalue**: 이동을 위해 설계된 "소멸 가능한 값(expiring value)"로, lvalue와 다르게 더 이상 유효한 상태로 간주되지 않습니다.
+
+---
+
+### **3. 이동 의미론에서 xvalue로 평가되는 이유**
+이동 의미론에서 xvalue가 중요한 이유는 다음과 같습니다:
+1. **소유권 이전**: `std::move(x)`는 객체를 이동 대상으로 표시하여, 다른 객체가 해당 객체의 자원을 소유할 수 있도록 합니다.
+2. **기존 객체를 안전하게 사용하지 않도록 표시**:
+   - `std::move(x)` 이후에도 `x`는 여전히 메모리에 존재하지만, 의미 있는 상태로 간주되지 않습니다.
+   - 이는 이동 연산의 설계 원칙에 따라 **기존 객체를 다시 사용하지 말라는 암묵적 신호**를 전달합니다.
+
+---
+
+### **4. 구체적인 예제**
+
+#### 코드
+```cpp
+#include <iostream>
+#include <string>
+#include <utility>
+
+int main() {
+    std::string s1 = "Hello";
+    std::string s2 = std::move(s1); // s1의 자원이 s2로 이동
+
+    std::cout << "s1: " << s1 << std::endl; // s1은 비어 있는 상태
+    std::cout << "s2: " << s2 << std::endl; // s2는 "Hello"
+
+    return 0;
+}
+```
+
+#### 출력
+```
+s1: 
+s2: Hello
+```
+
+#### 분석
+1. **`std::move(s1)`의 역할**:
+   - `s1`은 여전히 lvalue입니다.
+   - `std::move(s1)`는 rvalue로 캐스팅된 표현을 반환하며, 이 표현은 xvalue로 평가됩니다.
+   - `s1`의 내부 자원이 `s2`로 이동하고, 이후 `s1`은 의미 없는 상태가 됩니다.
+2. **`s1` 자체는 변경되지 않음**:
+   - `std::move`는 `s1`의 값 범주를 변경하지 않으며, 이동 이후에도 여전히 lvalue로 간주됩니다.
+   - 다만, 논리적으로 더 이상 의미 있는 값을 가지지 않으므로, 이동 후에는 `s1`을 다시 사용하지 않는 것이 권장됩니다.
+
+---
+
+### **5. "lvalue에서 xvalue로 바뀌는 것인가?"에 대한 답변**
+
+**아니요, `std::move(x)`는 `x`를 xvalue로 "바꾸는 것"이 아닙니다.**
+
+- `x`는 여전히 **lvalue**로 남아 있습니다.
+- `std::move(x)`는 **`x`를 rvalue로 캐스팅하고, 이 캐스팅된 표현이 xvalue로 평가되는 것**입니다.
+- 즉, `std::move`는 단지 `x`의 표현을 rvalue로 다루도록 만들 뿐이며, 객체의 본질적인 값 범주는 변경되지 않습니다.
+
+---
+
+### **6. 결론**
+1. `std::move(x)`는 lvalue인 `x`를 **rvalue로 캐스팅**하여, **xvalue로 평가되는 표현식**을 생성합니다.
+2. `x` 자체는 여전히 lvalue이며, 메모리에 그대로 존재합니다.
+3. xvalue는 이동 대상(expiring value)으로, 이동 후 객체는 의미 있는 상태로 간주되지 않습니다.
+4. `std::move`는 객체의 값 범주를 변경하지 않으며, 단지 객체를 이동 가능 상태로 표시하는 도구일 뿐입니다.
