@@ -351,19 +351,16 @@ Fraction& Fraction::operator/=(const Fraction& right) {
 
 ### 스마트 포인터 (Smart Pointers)
 
-* 특정 지역에서 동적으로 객체를 할당한 후 예기치 못한 상황으로 해당 지역을 벗어날 수 있음
-  * 할당한 객체가 소멸되지 않으면 메모리 누수가 발생할 수 있음
+* 동적 객체 할당 후 중간에 함수가 종료되거나 예외로 인하여 함수가 중간이 종료될 수 있음
+  * **할당한 객체가 소멸되지 않으면 메모리 누수가 발생할 수 있음**
 
 ```cpp
-int calc_with_dynamic_fraction_object() {
-  // let's assume that this function is too complex; there are many conditions
-  bool cond1 = true, cond2 = true, cond3 = false;
+void calc_with_dynamic_fraction_object() {
   Fraction* ptr = new Fraction(2, 5);
-  if (!cond1) return 1;
-  if (!cond2) return 2;
-  if (!cond3) return 3;
-  delete ptr;
-  return 0;
+
+  // Exception or return here: Fraction never released!
+
+  delete ptr;  // manual release required
 }
 ```
 
