@@ -250,7 +250,7 @@ std::cout << str << std::endl;  // str is moved to moved_str, > <EMPTY>
 
 ---
 
-## C++에서의 값 범위 (Value Category)
+## [C++에서의 값 범위 (Value Category)](https://medium.com/@barryrevzin/value-categories-in-c-17-f56ae54bccbe)
 
 ![center h:400](Figure_11_Value_Category.png)
 
