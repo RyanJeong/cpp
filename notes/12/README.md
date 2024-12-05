@@ -28,7 +28,7 @@ math: mathjax
 
 ---
 
-## 스트림
+## 스트림 (Streams)
 
 ![center](Figure_16_2.png)
 
@@ -479,6 +479,7 @@ std::ostream& operator<<(type& x);
 
 ![h:350 center](Figure_16_9.png)
 
+* `<fstream>` 헤더 파일 사용
 * 콘솔 스트림의 소스는 키보드, 싱크는 모니터였다면, 파일 스트림의 소스와 싱크는 파일
 * 콘솔 스트림에서의 데이터 멤버와 멤버 함수를 모두 사용할 수 있음
   * `std::ifstream` 클래스는 `std::istream` 클래스로부터 상속
@@ -637,7 +638,7 @@ int main() {
   std::ofstream ofstr;
   ofstr.open("file_stream_example.txt", std::ios::out | std::ios::app);
   if (!ofstr.is_open()) {
-    std::cerr << "file_ex2.txt cannot be opened!";
+    std::cerr << "file_stream_example.txt cannot be opened!";
     assert(false);
   }
   ofstr << "\nHello world!";
@@ -849,4 +850,591 @@ to          // 2 + 1('\n')
 do          // 2 + 1('\n')
 in          // 2 + 1('\n')
 life.       // 5           => 41
+```
+
+---
+
+## 이진 입출력 (Binary Input/Output)
+
+![center](Figure_16_11.png)
+
+* 파일 입출력 시 텍스트와 이진 데이터를 입출력할 수 있음
+* 이진 입출력은 텍스트 형태가 아닌 바이너리로 표현되는 데이터를 대상으로 입출력
+  * e.g., 오디오, 비디오, 사진 등 텍스트가 아닌 모든 데이터
+
+---
+
+* Writing and reading binary data
+
+```cpp
+#include <cassert>
+#include <fstream>
+#include <iostream>
+
+int main() {
+  const char* filename = "type_data.bin";
+
+  int int_out = 12325;
+  double double_out = 45.78;
+  std::ofstream ofstr(filename, std::ios::out | std::ios::binary);
+  if (!ofstr.is_open()) {
+    std::cerr << "The file binary_test cannot be opened for writing!";
+    assert(false);
+  }
+  ofstr.write(reinterpret_cast<char*>(&int_out), sizeof(int));
+  ofstr.write(reinterpret_cast<char*>(&double_out), sizeof(double));
+  ofstr.close();
+
+  int int_in;
+  double double_in;
+  std::ifstream ifstr(filename, std::ios::in | std::ios::binary);
+  if (!ifstr.is_open()) {
+    std::cerr << "The file binary_test cannot be opened for reading!";
+    assert(false);
+  }
+  ifstr.read(reinterpret_cast<char*>(&int_in), sizeof(int));
+  ifstr.read(reinterpret_cast<char*>(&double_in), sizeof(double));
+  ifstr.close();
+
+  std::cout << "Value of int_in: " << int_in << std::endl;
+  std::cout << "Value of double_in: " << double_in << std::endl;
+  return 0;
+}
+```
+
+---
+
+* Writing and reading binary data: for user-defined objects
+
+```cpp
+#include <fstream>
+#include <iostream>
+
+class Foo {
+  int id_;
+  double value_;
+
+ public:
+  Foo(int id, double value) : id_(id), value_(value) {}
+  Foo() : id_(0), value_(0.0) {}  // Default constructor for reading
+  void print() const {
+    std::cout << "ID: " << id_ << ", Value: " << value_ << std::endl;
+  }
+};
+
+int main() {
+  const char* filename = "object_data.bin";
+
+  Foo obj_out(527, 3.14);
+  // output stream's default mode: std::ios::out | std::ios::trunc
+  // If user sets the std::ios::app, std::ios::trunc will be ignored
+  std::ofstream out_file(filename, std::ios::binary);
+  if (out_file.is_open()) {
+    out_file.write(reinterpret_cast<char*>(&obj_out), sizeof(obj_out));
+    out_file.close();
+  }
+
+  Foo obj_in;
+  // input stream's default mode: std::ios::in
+  std::ifstream in_file(filename, std::ios::binary);
+  if (in_file.is_open()) {
+    in_file.read(reinterpret_cast<char*>(&obj_in), sizeof(obj_in));
+    in_file.close();
+  }
+  obj_in.print();
+  return 0;
+}
+```
+
+---
+
+* Writing and reading binary data: for PBM (Portable Bitmap) files
+
+```cpp
+#include <fstream>
+#include <iostream>
+
+constexpr int kWidth = 64;
+constexpr int kHeight = 64;
+
+// Saves the bitmap array to a PBM file.
+void SaveToPbm(const std::string& filename, const int bitmap[kHeight][kWidth]) {
+  std::ofstream file(filename);
+  if (!file.is_open()) {
+    std::cerr << "Failed to open file: " << filename << std::endl;
+    return;
+  }
+
+  // Write PBM header
+  file << "P1\n";
+  file << kWidth << " " << kHeight << "\n";
+
+  // Write pixel data
+  for (int y = 0; y < kHeight; ++y) {
+    for (int x = 0; x < kWidth; ++x) file << bitmap[y][x] << " ";
+    file << "\n";
+  }
+  file.close();
+}
+
+// Inverts the colors of the bitmap (white(1)->black(0), black(0)->white(1)).
+void InvertColors(int bitmap[kHeight][kWidth]) {
+  for (int y = 0; y < kHeight; ++y) {
+    for (int x = 0; x < kWidth; ++x)
+      bitmap[y][x] = 1 - bitmap[y][x];  // Flip 0 to 1 and 1 to 0
+  }
+}
+
+int main() {
+  int bitmap[kHeight][kWidth] = {{0}};  // Prepare a bitmap filled with black.
+  // Set diagonal pixels to white (1).
+  for (int i = 0; i < kWidth && i < kHeight; ++i) bitmap[i][i] = 1;
+  SaveToPbm("original.pbm", bitmap);
+
+  InvertColors(bitmap);
+  SaveToPbm("inverted.pbm", bitmap);
+  return 0;
+}
+```
+
+---
+
+### 이진 입출력 응용: 임의 접근
+
+```cpp
+#include <fstream>
+#include <iostream>
+
+class Foo {
+  int id_;
+  double value_;
+
+ public:
+  Foo(int id, double value) : id_(id), value_(value) {}
+  Foo() : id_(0), value_(0.0) {}  // Default constructor for reading
+  void print() const {
+    std::cout << "ID: " << id_ << ", Value: " << value_ << std::endl;
+  }
+};
+
+int main() {
+  const char* filename = "object_data_random_access.bin";
+
+  Foo objs_out[] = {{527, 3.14}, {920, 1.414}, {777, 1.732}};
+  // output stream's default mode: std::ios::out | std::ios::trunc
+  // If user sets the std::ios::app, std::ios::trunc will be ignored
+  std::ofstream out_file(filename, std::ios::binary);
+  if (out_file.is_open()) {
+    for (int i = 0; i < sizeof objs_out / sizeof(Foo); ++i)
+      out_file.write(reinterpret_cast<char*>(&objs_out[i]), sizeof(Foo));
+    out_file.close();
+  }
+
+  Foo obj_in;
+  // input stream's default mode: std::ios::in
+  std::ifstream in_file(filename, std::ios::binary);
+  if (in_file.is_open()) {
+    in_file.seekg(sizeof(Foo), std::ios::beg);  // offset: sizeof(Foo)
+    in_file.read(reinterpret_cast<char*>(&obj_in), sizeof(obj_in));
+    in_file.close();
+  }
+  obj_in.print();
+  return 0;
+}
+```
+
+---
+
+### 이진 입출력 응용: 직렬화 (Serialization)
+
+* foo.hpp
+
+```cpp
+#pragma once
+
+#include <fstream>
+#include <iostream>
+#include <string>
+
+class Foo {
+  int id_;
+  double value_;
+  std::string name_;
+
+ public:
+  Foo(int id, double value, const std::string& name)
+      : id_(id), value_(value), name_(name) {}
+  Foo() : id_(0), value_(0.0), name_(std::string()) {}
+
+  // Serialize the object to a binary file.
+  void Serialize(std::ofstream& out_file) const {
+    out_file.write(reinterpret_cast<const char*>(&id_), sizeof(id_));
+    out_file.write(reinterpret_cast<const char*>(&value_), sizeof(value_));
+    size_t name_length = name_.size();  // Write the length of the string.
+    out_file.write(reinterpret_cast<const char*>(&name_length),
+                   sizeof(name_length));  // Write the string data.
+    out_file.write(name_.c_str(), name_length);
+  }
+
+  // Deserialize the object from a binary file.
+  void Deserialize(std::ifstream& in_file) {
+    in_file.read(reinterpret_cast<char*>(&id_), sizeof(id_));
+    in_file.read(reinterpret_cast<char*>(&value_), sizeof(value_));
+    size_t name_length;  // Read the length of the string.
+    in_file.read(reinterpret_cast<char*>(&name_length), sizeof(name_length));
+    char* buffer = new char[name_length + 1];  // Read the string data.
+    in_file.read(buffer, name_length);
+    buffer[name_length] = '\0';  // Null-terminate the string.
+    name_ = buffer;
+    delete[] buffer;
+  }
+
+  void print() const {
+    std::cout << "ID: " << id_ << ", Value: " << value_ << ", Name: " << name_
+              << std::endl;
+  }
+};
+```
+
+---
+
+* main.cc
+
+```cpp
+#include <fstream>
+#include <iostream>
+
+#include "foo.hpp"
+
+int main() {
+  const char* filename = "object_data_serialization.bin";
+
+  Foo objects[] = {
+      {1, 3.14, "Alice"},
+      {2, 2.71, "Bob"},
+      {3, 1.62, "Charlie"},
+  };
+  std::ofstream out_file(filename, std::ios::binary);
+  if (!out_file.is_open()) {
+    std::cerr << "Failed to open file for writing: " << filename << std::endl;
+    return 1;
+  }
+  for (int i = 0; i < sizeof objects / sizeof(Foo); ++i)
+    objects[i].Serialize(out_file);
+  out_file.close();
+
+  std::ifstream in_file(filename, std::ios::binary);
+  if (!in_file.is_open()) {
+    std::cerr << "Failed to open file for reading: " << filename << std::endl;
+    return 1;
+  }
+  for (int i = 0; i < sizeof objects / sizeof(Foo); ++i) {
+    Foo object;
+    object.Deserialize(in_file);
+    object.print();
+  }
+  out_file.close();
+
+  return 0;
+}
+```
+
+---
+
+## 문자열 스트림 (String Streams)
+
+![center](Figure_16_13.png)
+
+* `<sstream>` 헤더 파일 사용
+* C++ 문자열을 소스 또는 싱크로 활용
+
+---
+
+### 문자열 스트림 멤버 함수 `str()`
+
+* 파일 스트림과 달리 소스 또는 싱크와의 연결이 필요하지 않음
+* 새로운 데이터 멤버 `str()`을 사용해 현재 스트림 객체의 데이터를 설정하거나 읽어올 수 있음:
+
+```cpp
+void str(string strg);  // Connect the parameter to the host object
+string str() const;     // Returns the string connected to the host object
+```
+
+* Testing string stream classes with a new member function: `str()`
+
+```cpp
+#include <iostream>
+#include <string>
+#include <sstream>
+
+int main() {
+  std::istringstream iss("Hello friends!");
+  std::cout << iss.str() << std::endl;
+  iss.str("Hello world!");
+  std::cout << iss.str() << std::endl << std::endl;
+  std::ostringstream oss("Bye friends!");
+  std::cout << oss.str() << std::endl;
+  oss.str("Bye world!");
+  std::cout << oss.str() << std::endl;
+  return 0;
+}
+```
+
+---
+
+* Testing `std::istringstream`
+
+```cpp
+#include <iostream>
+#include <sstream>
+#include <string>
+
+int main() {
+  std::string str = "42 3.14 John";
+  std::istringstream iss(str);
+
+  int int_value;
+  double double_value;
+  std::string string_value;
+  iss >> int_value >> double_value >> string_value;
+  std::cout << "Parsed values: " << int_value << ", " << double_value << ", "
+            << string_value << std::endl;
+  return 0;
+}
+```
+
+---
+
+* Testing `std::ostringstream`
+
+```cpp
+#include <iostream>
+#include <sstream>
+#include <string>
+
+int main() {
+  std::ostringstream oss;
+
+  int int_value = 42;
+  double double_value = 3.14;
+  std::string string_value = "John";
+  oss << "Value 1: " << int_value << ", Value 2: " << double_value
+      << ", Name: " << string_value;
+
+  std::string result = oss.str();
+  std::cout << "Generated string: " << result << std::endl;
+
+  return 0;
+}
+```
+
+---
+
+## 데이터 형식화 (Formatting Data)
+
+* 스트림 객체에는 데이터 형식을 변경하는 조정자 (manipulators)가 있음
+  * `std::ios` 클래스에 정의되어 있음
+* 삽입 연산자와 추출 연산자에 조정자를 같이 사용해 데이터를 형식화할 수 있음
+
+```cpp
+std::istream& std::istream::operator>>(std::istream& (*pf)(istream&));
+std::ostream& std::ostream::operator<<(std::ostream& (*pf)(ostream&));
+
+// dereference a specific manipulator using a function pointer
+std::istream& name(std::itream& is) {
+  // action
+  return is;
+}
+
+// dereference a specific manipulator using a function pointer
+std::ostream& name(std::ostream& os) {
+  // action
+  return os;
+}
+```
+
+---
+
+### 매개변수 없는 조정자 정의
+
+* 텍스트 출력 색상을 변경하는 조정자
+
+```cpp
+#include <iostream>
+
+// set the text color: "\033[3Xm"
+// X: 0(black), 1(Red), 2(Green), 3(Yellow),
+//    4(Blue), 5(Magenta), 6(Cyan), 7(White)
+std::ostream& color_red(std::ostream& stream) {
+  std::cout << "\033[31m";
+  return stream;
+}
+
+std::ostream& color_green(std::ostream& stream) {
+  std::cout << "\033[32m";
+  return stream;
+}
+
+std::ostream& color_yellow(std::ostream& stream) {
+  std::cout << "\033[33m";
+  return stream;
+}
+
+int main() {
+  std::cout << "ABC" << color_red << "DE" << std::endl;
+  std::cout << "123" << color_green << "45" << std::endl;
+  std::cout << color_yellow << "Banana" << std::endl;
+  return 0;
+}
+```
+
+---
+
+### 매개변수 조정자 정의
+
+```cpp
+#include <iostream>
+
+class Location {
+  const char* name_;
+
+ public:
+  Location(const char* name) : name_(name) {}
+  friend std::ostream& operator<<(std::ostream& stream, const Location& loc) {
+    std::cout << '[' << loc.name_ << "] ";
+    return stream;
+  }
+};
+
+void foo() { std::cout << Location(__func__) << "Hello" << std::endl; }
+void bar() { std::cout << Location(__func__) << "Hello" << std::endl; }
+void qux() { std::cout << Location(__func__) << "Hello" << std::endl; }
+
+int main() {
+  foo(), bar(), qux();
+  return 0;
+}
+```
+
+---
+
+### 출력 데이터 형식화
+
+* 지속성 조정자 (persistent manipulators)
+
+```cpp
+#include <iomanip>  // Required header
+#include <iostream>
+
+int main() {
+  bool b = true;
+  int i = 255;
+  double pi = 0.000'000'000'125;
+
+  // Default format manipulator for bool type: std::noboolalpha
+  std::cout << std::boolalpha << b << '\n';    // Output: true
+  std::cout << std::noboolalpha << b << '\n';  // Output: 1
+
+  std::cout << std::dec << i << '\n';  // Output: 255 (decimal form)
+  std::cout << std::oct << std::showbase << i
+            << '\n';  // Output: 0377 (octal form with base display)
+  std::cout << std::hex << i
+            << '\n';  // Output: 0xff (hexadecimal form with base display)
+  std::cout << std::noshowbase;
+
+  std::cout << pi << '\n';  // Output: 1.25e-10
+  std::cout << std::fixed << pi << '\n';  // Output: 0.000000
+  std::cout << pi << '\n';  // Output: 0.000000
+  return 0;
+}
+```
+
+---
+
+* 일회성 조정자 (temporary manipulators)
+
+```cpp
+#include <iostream>
+#include <iomanip>  // Required header to use manipulators
+
+int main() {
+  int i = 42;
+  float f = 3.14159265f;
+
+  // Using std::setw() and std::setfill()
+  std::cout << std::setw(10) << std::setfill('*') << i << std::endl;
+  std::cout << i << std::endl;  // Output without the effect of setw and setfill
+
+  // Using std::setprecision()
+  std::cout << std::fixed << std::setprecision(4) << f << std::endl;
+  std::cout << f << std::endl;  // Output without the effect of setprecision
+                                // (in this case, std::fixed persistently
+                                // changes the stream state)
+  return 0;
+}
+```
+
+---
+
+### 입력 데이터 형식화
+
+* 지속성 조정자 (persistent manipulators)
+
+```cpp
+#include <iomanip>  // Required header
+#include <iostream>
+
+int main() {
+  char c = 'A';
+  int i = 255;
+  float f = 123.456789f;
+
+  // Default format manipulator for floating-point numbers: std::defaultfloat
+  std::cout << std::fixed << f
+            << '\n';  // Output: 123.456787 (fixed-point notation)
+  std::cout << std::scientific << f
+            << '\n';  // Output: 1.234568e+02 (scientific notation)
+
+  std::cout << std::left << std::setw(10) << c << " Left aligned" << '\n';
+  std::cout << std::right << std::setw(10) << c << " Right aligned" << '\n';
+  std::cout << std::internal << std::setw(10) << (-i) << " Internal aligned"
+            << '\n';
+  return 0;
+}
+```
+
+---
+
+* 일회성 조정자 (temporary manipulators)
+
+```cpp
+#include <iostream>
+
+// In C++, input manipulators (boolalpha, noboolalpha, dec, oct, and hex) are
+// persistent.
+int main() {
+  bool b;
+  std::cout << "Enter a boolean (true/false): ";
+  std::cin >> std::boolalpha >> b;  // Using boolalpha to read 'true' or 'false'
+  std::cout << "You entered: " << b << std::endl;
+  std::cin >> std::noboolalpha;  // Reset to default (which is noboolalpha)
+
+  int d, o, h;
+  std::cout << "Enter an integer in decimal format: ";
+  // This is the default behavior, but shown here for clarity
+  std::cin >> std::dec >> d;
+  std::cout << "Enter an integer in octal format (e.g., 0377): ";
+  std::cin >> std::oct >> o;
+  std::cout << "Enter an integer in hexadecimal format (e.g., 0xff): ";
+  std::cin >> std::hex >> h;
+  std::cout << std::showbase << std::dec << d << ' ' << std::oct << o << ' '
+            << std::hex << h << std::endl;
+  std::cout << std::noshowbase << std::dec << d << ' ' << o << ' ' << h
+            << std::endl;
+  std::cin >> std::dec;  // Reset to default (which is dec)
+
+  // Using std::endl to insert newline and flush the buffer
+  std::cout << "This is a line." << std::endl;
+  return 0;
+}
 ```
