@@ -2,7 +2,13 @@
 
 C++ 내용들을 정리한 디렉토리입니다.
 
-## Index
+## TODOs
+
+* Create a Dockerfile to generate pdfs automatically using CI/CD
+* Parse each README.md to name the generated pdf file
+* Improve contents periodically (`move`, `thread`, `template-meta`, etc.)
+
+## [WIP] Index
 
 * [01 - C++ 기초](./01)
 * [02 - 레퍼런스](./02)
